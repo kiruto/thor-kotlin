@@ -1,0 +1,27 @@
+group 'yell-kotlin'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    def libs = rootProject.libs
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$libs.kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
+    compile "org.xerial:sqlite-jdbc:$libs.sqlite_jdbc"
+    compile "com.github.davidmoten:rxjava-jdbc:$libs.rxjava_jdbc"
+    compile "com.google.guava:guava:$libs.guava"
+}

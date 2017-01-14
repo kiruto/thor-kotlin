@@ -1,0 +1,2 @@
+rootProject.name = 'yell-kotlin'
+include ':core'

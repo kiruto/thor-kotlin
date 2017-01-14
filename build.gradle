@@ -1,0 +1,44 @@
+group 'yell-kotlin'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext{
+        libs = [
+                kotlin_version: '1.0.6',
+                tomcat_plugin: '2.2.5',
+                sqlite_jdbc: '3.7.2',
+                rxjava_jdbc: '0.7.3',
+                guava: '19.0',
+                junit: '4.11'
+        ]
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.bmuschko:gradle-tomcat-plugin:$libs.tomcat_plugin"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$libs.kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: "com.bmuschko.tomcat"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
+    compile project(':core')
+    testCompile group: 'junit', name: 'junit', version: "$libs.junit"
+}
+
+tomcat {
+    httpPort = 8080
+}
