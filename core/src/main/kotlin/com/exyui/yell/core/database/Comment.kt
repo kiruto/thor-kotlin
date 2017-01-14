@@ -9,30 +9,20 @@ import java.sql.ResultSet
 /**
  * Created by yuriel on 1/14/17.
  *
- * @param id :
- *  comment id (unique per website).
- * @param parent :
- * 	parent id reference, may be null.
- * @param text :
- * 	required, comment written in Markdown.
+ * @param id : comment id (unique per website).
+ * @param parent : parent id reference, may be null.
+ * @param text : required, comment written in Markdown.
  * @param mode :
  *  1 – accepted
  *  2 – in moderation queue
  * 	4 – deleted, but referenced.
- * @param hash :
- * 	user identication, used to generate identicons. PBKDF2 from email or IP address (fallback).
- * @param author :
- * 	author's name, may be null.
- * @param website :
- * 	author's website, may be null.
- * @param likes :
- * 	upvote count, defaults to 0.
- * @param dislikes :
- * 	downvote count, defaults to 0.
- * @param created :
- * 	time in seconds since UNIX time.
- * @param modified :
- * 	last modification since UNIX time, may be null.
+ * @param hash : user identication, used to generate identicons. PBKDF2 from email or IP address (fallback).
+ * @param author : author's name, may be null.
+ * @param website : author's website, may be null.
+ * @param likes : upvote count, defaults to 0.
+ * @param dislikes : downvote count, defaults to 0.
+ * @param created : time in seconds since UNIX time.
+ * @param modified : last modification since UNIX time, may be null.
  */
 data class Comment(val tid: Int? = null,
                    val id: Int? = null,
@@ -107,7 +97,7 @@ data class Comment(val tid: Int? = null,
          * @param: uri
          * @param: mode
          */
-        fun fetch(uri: String, mode: Int = 5, after: Int = 0, parent: Int? = -1, order_by: String = "id", limit: Int? = null): Observable<Comment> {
+        fun fetch(uri: String, mode: Int = 5, after: Int = 0, parent: Int? = -1, orderBy: String = "id", limit: Int? = null): Observable<Comment> {
             var sql = "SELECT comments.* FROM comments INNER JOIN threads ON " +
                     "threads.uri=? AND comments.tid=threads.id AND (? | comments.mode) = ? " +
                     "AND comments.created > ? "
@@ -120,7 +110,7 @@ data class Comment(val tid: Int? = null,
                 args.add(parent)
             }
 
-            val order = if (order_by in listOf("id", "created", "modified", "likes", "dislikes")) order_by else "id"
+            val order = if (orderBy in listOf("id", "created", "modified", "likes", "dislikes")) orderBy else "id"
             sql += "ORDER BY $order ASC "
 
             limit?.let {
@@ -153,7 +143,7 @@ data class Comment(val tid: Int? = null,
                     .subscribe { r ->
                         if (r) {
                             Conn.observable.update("DELETE FROM comments WHERE id=?").parameter(id).execute()
-                            remove_stale()
+                            removeStale()
                         } else {
                             Conn.observable.update("UPDATE comments SET text=? WHERE id=?")
                                     .parameter("")
@@ -171,12 +161,12 @@ data class Comment(val tid: Int? = null,
                                     .parameter(null)
                                     .parameter(id)
                                     .execute()
-                            remove_stale()
+                            removeStale()
                         }
                     }
         }
 
-        private fun remove_stale() {
+        private fun removeStale() {
             val sql = "DELETE FROM comments WHERE mode=4 AND id NOT IN (SELECT parent FROM comments WHERE parent IS NOT NULL)"
             while (0 != Conn.observable.update(sql).execute());
         }
@@ -244,8 +234,22 @@ data class Comment(val tid: Int? = null,
         /**
          * Return comment count for one ore more urls..
          */
-        fun count() {
-
+        fun count(vararg urls: String): IntArray {
+            val sql = "SELECT threads.uri, COUNT(comments.id) FROM comments " +
+                    "LEFT OUTER JOIN threads ON threads.id = tid AND comments.mode = 1 " +
+                    "GROUP BY threads.uri"
+            return Conn.observable.select(sql)
+                    .get { Pair(it.getString(0), it.getInt(1)) }
+                    .reduce(mutableMapOf<String, Int>()) { map, pair ->
+                        map.put(pair.first, pair.second)
+                        map
+                    }
+                    .reduce(IntArray(urls.size)) { array, map ->
+                        urls.mapIndexed { i, s -> array[i] = map[s]?: 0 }
+                        array
+                    }
+                    .toBlocking()
+                    .single()
         }
 
         /**
@@ -257,8 +261,16 @@ data class Comment(val tid: Int? = null,
                     .parameter(System.currentTimeMillis())
                     .parameter(delta)
                     .execute()
-            remove_stale()
+            removeStale()
         }
+    }
+
+    override fun hashCode(): Int {
+        return toString().hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return toString() == other?.toString()
     }
 
     override fun toString(): String {
