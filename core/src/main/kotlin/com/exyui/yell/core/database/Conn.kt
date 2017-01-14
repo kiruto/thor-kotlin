@@ -31,7 +31,9 @@ object Conn {
     private fun createComment() {
         stmt(CREATE_COMMENT).execute()
     }
-    private fun createThread() {}
+    private fun createThread() {
+        stmt(CREATE_THREAD).execute()
+    }
     private fun createPreference() {}
 
 }

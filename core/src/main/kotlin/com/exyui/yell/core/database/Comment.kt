@@ -15,7 +15,7 @@ import java.sql.ResultSet
  * @param mode :
  *  1 – accepted
  *  2 – in moderation queue
- * 	4 – deleted, but referenced.
+ *  4 – deleted, but referenced.
  * @param hash : user identication, used to generate identicons. PBKDF2 from email or IP address (fallback).
  * @param author : author's name, may be null.
  * @param website : author's website, may be null.
@@ -39,7 +39,7 @@ data class Comment(val tid: Int? = null,
                    val dislikes: Int = 0,
                    val voters: ByteArray? = null) {
 
-    constructor(rs: ResultSet): this(
+    private constructor(rs: ResultSet): this(
             tid = rs.getInt(0),
             id = rs.getInt(1),
             parent = rs.getInt(2),
