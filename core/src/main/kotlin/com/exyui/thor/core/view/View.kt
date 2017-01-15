@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
  */
 class View {
 
-    private val log = Logger.getLogger(this.javaClass)
+    private val log = Logger.getLogger(javaClass)
 
     @Throws(ThorBadRequest::class)
     fun insertComment(uri: String, title: String, author: String? = null, email: String? = null, website: String? = null, text: String, remoteAddr: String): Pair<Int, Comment> {

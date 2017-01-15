@@ -11,6 +11,8 @@ buildscript {
                 guava: '19.0',
                 apache_commons: '3.5',
                 log4j: '1.2.17',
+                javaee: '7.0',
+                servlet: '3.1.0',
                 junit: '4.11'
         ]
     }
@@ -28,7 +30,8 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
-apply plugin: "com.bmuschko.tomcat"
+apply plugin: 'war'
+apply plugin: 'com.bmuschko.tomcat'
 
 repositories {
     mavenCentral()
@@ -37,8 +40,10 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
+    compile group: 'javax', name: 'javaee-api', version: libs.javaee
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: libs.servlet
     compile project(':core')
-    testCompile group: 'junit', name: 'junit', version: "$libs.junit"
+    testCompile group: 'junit', name: 'junit', version: libs.junit
 }
 
 tomcat {
