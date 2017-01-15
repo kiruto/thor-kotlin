@@ -1,4 +1,4 @@
-group 'yell-kotlin'
+group 'thor-kotlin'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -9,6 +9,8 @@ buildscript {
                 sqlite_jdbc: '3.7.2',
                 rxjava_jdbc: '0.7.3',
                 guava: '19.0',
+                apache_commons: '3.5',
+                log4j: '1.2.17',
                 junit: '4.11'
         ]
     }

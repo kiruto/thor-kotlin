@@ -1,4 +1,4 @@
-package com.exyui.yell.core.database
+package com.exyui.thor.core.database
 
 import com.google.common.hash.BloomFilter
 import com.google.common.hash.Funnels
@@ -30,7 +30,7 @@ data class Comment(val tid: Int? = null,
                    val created: Double? = null,
                    val modified: Double? = null,
                    val mode: Int = 0,
-                   val remoteAddr: String? = null,
+                   val remoteAddr: String,
                    val text: String? = null,
                    val author: String? = null,
                    val email: String? = null,
@@ -74,7 +74,7 @@ data class Comment(val tid: Int? = null,
                     .parameter(data.toString())
                     .parameter(id)
                     .execute()
-            return get(id)
+            return get(id)!!
         }
 
         /**
@@ -82,7 +82,7 @@ data class Comment(val tid: Int? = null,
          * @param: id
          * @return a comment.
          */
-        fun get(id: Int): Comment {
+        operator fun get(id: Int): Comment? {
             return Conn.observable
                     .select("SELECT * FROM comments WHERE id=?")
                     .parameter(id)
@@ -180,7 +180,7 @@ data class Comment(val tid: Int? = null,
             val c = Conn.observable
                     .select("SELECT likes, dislikes, voters FROM comments WHERE id=?")
                     .parameter(id)
-                    .get { Comment(likes = it.getInt(0), dislikes = it.getInt(1), voters = it.getBytes(2)) }
+                    .get { Comment(likes = it.getInt(0), dislikes = it.getInt(1), voters = it.getBytes(2), remoteAddr = "") }
                     .toBlocking()
                     .first()
             if (c.likes + c.dislikes >= 142)
@@ -263,6 +263,52 @@ data class Comment(val tid: Int? = null,
                     .execute()
             removeStale()
         }
+    }
+
+    /**
+     * Add new comment to DB and return a comment and database values.
+     */
+    fun insert(uri: String): Pair<Int, Comment> {
+        var p: Int? = parent
+        parent?.let {
+            val ref = Comment[it]
+            ref?.let {
+                p = it.parent
+            }
+        }
+
+        val bf = getBloomFilter(1)
+        bf.put(remoteAddr.toByteArray())
+        val output = ByteArrayOutputStream()
+        bf.writeTo(output)
+
+        Conn.observable.update(
+                "INSERT INTO comments (" +
+                "    tid, parent," +
+                "    created, modified, mode, remote_addr," +
+                "    text, author, email, website, voters )" +
+                "SELECT" +
+                "    threads.id, ?," +
+                "    ?, ?, ?, ?," +
+                "    ?, ?, ?, ?, ?" +
+                "FROM threads WHERE threads.uri = ?;")
+                .parameter(p)
+                .parameter(created?: System.currentTimeMillis())
+                .parameter(null)
+                .parameter(mode)
+                .parameter(remoteAddr)
+                .parameter(text)
+                .parameter(author)
+                .parameter(email)
+                .parameter(website)
+                .parameter(output.toByteArray())
+                .parameter(uri)
+                .execute()
+        return Conn.observable.select("SELECT *, MAX(c.id) FROM comments AS c INNER JOIN threads ON threads.uri = ?")
+                .parameter(uri)
+                .get { Pair(it.getInt(it.fetchSize - 1), Comment(it)) }
+                .toBlocking()
+                .single()
     }
 
     override fun hashCode(): Int {

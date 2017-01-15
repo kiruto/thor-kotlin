@@ -1,4 +1,4 @@
-group 'yell-kotlin'
+group 'thor-kotlin'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -24,4 +24,6 @@ dependencies {
     compile "org.xerial:sqlite-jdbc:$libs.sqlite_jdbc"
     compile "com.github.davidmoten:rxjava-jdbc:$libs.rxjava_jdbc"
     compile "com.google.guava:guava:$libs.guava"
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: libs.apache_commons
+    compile group: 'log4j', name: 'log4j', version: libs.log4j
 }

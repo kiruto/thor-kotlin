@@ -1,2 +1,2 @@
-rootProject.name = 'yell-kotlin'
+rootProject.name = 'thor-kotlin'
 include ':core'
