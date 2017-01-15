@@ -24,28 +24,11 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.bmuschko:gradle-tomcat-plugin:$libs.tomcat_plugin"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$libs.kotlin_version"
+        classpath "com.bmuschko:gradle-tomcat-plugin:$libs.tomcat_plugin"
     }
 }
 
-apply plugin: 'kotlin'
-apply plugin: 'war'
-apply plugin: 'com.bmuschko.tomcat'
-
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
-    compile group: 'javax', name: 'javaee-api', version: libs.javaee
-    compile group: 'javax.servlet', name: 'javax.servlet-api', version: libs.servlet
-    compile project(':core')
-    testCompile group: 'junit', name: 'junit', version: libs.junit
-}
-
-tomcat {
-    httpPort = 8080
 }

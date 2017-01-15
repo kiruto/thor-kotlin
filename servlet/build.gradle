@@ -6,6 +6,8 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
+apply plugin: 'war'
+apply plugin: 'com.bmuschko.tomcat'
 
 repositories {
     mavenCentral()
@@ -14,9 +16,12 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
-    compile "org.xerial:sqlite-jdbc:$libs.sqlite_jdbc"
-    compile "com.github.davidmoten:rxjava-jdbc:$libs.rxjava_jdbc"
-    compile "com.google.guava:guava:$libs.guava"
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: libs.apache_commons
     compile group: 'log4j', name: 'log4j', version: libs.log4j
+    compile group: 'javax', name: 'javaee-api', version: libs.javaee
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: libs.servlet
+    compile project(':core')
+}
+
+tomcat {
+    httpPort = 8080
 }
