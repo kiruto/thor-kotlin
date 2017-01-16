@@ -7,7 +7,7 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'war'
-apply plugin: 'com.bmuschko.tomcat'
+apply plugin: 'org.akhikhl.gretty'
 
 repositories {
     mavenCentral()
@@ -22,6 +22,7 @@ dependencies {
     compile project(':core')
 }
 
-tomcat {
-    httpPort = 8080
+gretty {
+    port = 8080
+    serlvetContainer = 'tomcat8'
 }

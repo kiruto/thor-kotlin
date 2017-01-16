@@ -25,7 +25,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$libs.kotlin_version"
-        classpath "com.bmuschko:gradle-tomcat-plugin:$libs.tomcat_plugin"
+        classpath 'org.akhikhl.gretty:gretty:+'
     }
 }
 
