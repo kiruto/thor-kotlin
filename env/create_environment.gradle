@@ -1,0 +1,42 @@
+import groovy.json.JsonSlurper
+
+task createEnvironment {
+    doLast {
+        def slurper = new JsonSlurper()
+        def hosts = slurper.parseText host
+
+        def file = new File(rootDir, 'env/src/main/kotlin/com/exyui/thor/env.kt')
+        println("Creating environment configuration file...")
+        file.withWriter('utf-8') { writer ->
+            writer.writeLine 'package com.exyui.thor'
+            writer.writeLine ''
+            writer.writeLine '/**'
+            writer.writeLine " * Created by machine on ${new Date().format('yyyy-MM-dd')}"
+            writer.writeLine ''
+            writer.writeLine ' * This file is generated automatically, DO NOT modify!!!'
+            writer.writeLine ' */'
+            writer.writeLine ''
+            writer.writeLine "const val DEBUG = $debug"
+            writer.writeLine ""
+            writer.writeLine "const val SQLITE_FILE = \"$db_file\""
+            writer.writeLine "const val MODERATED = false"
+            writer.writeLine ""
+            writer.writeLine "const val PACKAGE_VERSION = \"$version\""
+            writer.writeLine "const val HOST_DEBUG = \"http://127.0.0.1\""
+            writer.writeLine "val HOST_RELEASE = listOf("
+            hosts.eachWithIndex { val, idx ->
+                writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")
+            }
+            writer.writeLine ")"
+            writer.writeLine "const val ORIGIN_DEBUG = \"*\""
+            writer.writeLine "val ORIGIN_RELEASE = listOf("
+            hosts.eachWithIndex { val, idx ->
+                writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")
+            }
+            writer.writeLine ")"
+        }
+        println("Environment configuration file created!")
+    }
+}
+
+build.dependsOn createEnvironment

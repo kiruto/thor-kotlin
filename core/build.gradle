@@ -19,4 +19,5 @@ dependencies {
     compile "com.google.guava:guava:$libs.guava"
     compile group: 'org.apache.commons', name: 'commons-lang3', version: libs.apache_commons
     compile group: 'log4j', name: 'log4j', version: libs.log4j
+    compile project(':env')
 }

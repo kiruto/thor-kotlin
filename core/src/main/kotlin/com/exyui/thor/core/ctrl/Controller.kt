@@ -1,7 +1,7 @@
-package com.exyui.thor.core.view
+package com.exyui.thor.core.ctrl
 
-import com.exyui.thor.core.MODERATED
-import com.exyui.thor.core.ThorBadRequest
+import com.exyui.thor.*
+import com.exyui.thor.core.*
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
 import org.apache.log4j.Logger
@@ -10,9 +10,19 @@ import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
 /**
  * Created by yuriel on 1/15/17.
  */
-class View {
+class Controller {
+
+    private val host = if (DEBUG) listOf(HOST_DEBUG) else HOST_RELEASE
+    private val origin = if (DEBUG) listOf(ORIGIN_DEBUG) else ORIGIN_RELEASE
 
     private val log = Logger.getLogger(javaClass)
+
+    val info = mapOf(
+            Pair("host", host),
+            Pair("origin", origin),
+            Pair("version", PACKAGE_VERSION),
+            Pair("moderation", MODERATED)
+    )
 
     @Throws(ThorBadRequest::class)
     fun insertComment(uri: String, title: String, author: String? = null, email: String? = null, website: String? = null, text: String, remoteAddr: String): Pair<Int, Comment> {
@@ -41,6 +51,9 @@ class View {
         log.info("comments.new:after-save:${rv.first}")
         return rv
     }
+
+    @Throws(ThorNotFound::class)
+    fun viewComment(id: Int) = Comment[id] ?: throw ThorNotFound("comment($id)")
 
     private fun urlFor(url: String?): String? {
         url?: return null

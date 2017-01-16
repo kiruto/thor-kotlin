@@ -5,3 +5,5 @@ package com.exyui.thor.core
  */
 open class ThorException(msg: String): Exception(msg)
 class ThorBadRequest(reason: String?): ThorException("Bad request: $reason")
+class ThorNotFound(things: String?): ThorException("Not found $things")
+class ThorForbidden(): ThorException("Forbidden")

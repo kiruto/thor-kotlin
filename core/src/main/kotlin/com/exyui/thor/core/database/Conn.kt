@@ -1,6 +1,6 @@
 package com.exyui.thor.core.database
 
-import com.exyui.thor.core.SQLITE_FILE
+import com.exyui.thor.SQLITE_FILE
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.PreparedStatement

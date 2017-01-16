@@ -1,5 +1,7 @@
 package com.exyui.thor.core.database
 
+import com.exyui.thor.core.Accept
+import com.exyui.thor.core.PublicApi
 import com.google.common.hash.BloomFilter
 import com.google.common.hash.Funnels
 import rx.Observable
@@ -25,18 +27,18 @@ import java.sql.ResultSet
  * @param modified : last modification since UNIX time, may be null.
  */
 data class Comment(val tid: Int? = null,
-                   val id: Int? = null,
-                   val parent: Int? = null,
-                   val created: Double? = null,
-                   val modified: Double? = null,
+                   @PublicApi val id: Int? = null,
+                   @PublicApi @Accept val parent: Int? = null,
+                   @PublicApi val created: Double? = null,
+                   @PublicApi val modified: Double? = null,
                    val mode: Int = 0,
                    val remoteAddr: String,
-                   val text: String? = null,
-                   val author: String? = null,
-                   val email: String? = null,
-                   val website: String? = null,
-                   val likes: Int = 0,
-                   val dislikes: Int = 0,
+                   @PublicApi @Accept val text: String? = null,
+                   @PublicApi @Accept val author: String? = null,
+                   @Accept val email: String? = null,
+                   @PublicApi @Accept val website: String? = null,
+                   @PublicApi val likes: Int = 0,
+                   @PublicApi val dislikes: Int = 0,
                    val voters: ByteArray? = null) {
 
     private constructor(rs: ResultSet): this(
@@ -311,6 +313,8 @@ data class Comment(val tid: Int? = null,
                 .single()
     }
 
+    val hash = (email + remoteAddr).hashCode()
+
     override fun hashCode(): Int {
         return toString().hashCode()
     }
@@ -326,7 +330,7 @@ data class Comment(val tid: Int? = null,
                 created?.let { "created = $created, " } +
                 modified?.let { "modified = $modified, " } +
                 "mode = $mode, " +
-                remoteAddr?.let { "remoteAddr = $remoteAddr, " } +
+                "remoteAddr = $remoteAddr, " +
                 text?.let { "text = $text, " } +
                 author?.let { "author = $author, " } +
                 email?.let { "email = $email, " } +

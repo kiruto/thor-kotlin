@@ -20,9 +20,11 @@ dependencies {
     compile group: 'javax', name: 'javaee-api', version: libs.javaee
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: libs.servlet
     compile project(':core')
+    compile project(':crypto')
+    compile project(':env')
 }
 
 gretty {
     port = 8080
-    serlvetContainer = 'tomcat8'
+    servletContainer = 'tomcat8'
 }

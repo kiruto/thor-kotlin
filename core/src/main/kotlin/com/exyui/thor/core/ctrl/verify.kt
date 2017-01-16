@@ -1,4 +1,4 @@
-package com.exyui.thor.core.view
+package com.exyui.thor.core.ctrl
 
 import com.exyui.thor.core.database.Comment
 import java.util.regex.Pattern
