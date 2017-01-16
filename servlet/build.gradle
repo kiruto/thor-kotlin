@@ -7,7 +7,7 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'war'
-apply plugin: 'org.akhikhl.gretty'
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 repositories {
     mavenCentral()
@@ -25,6 +25,6 @@ dependencies {
 }
 
 gretty {
-    port = 8080
-    servletContainer = 'tomcat8'
+    servletContainer = 'jetty9'
+    port = 8081
 }

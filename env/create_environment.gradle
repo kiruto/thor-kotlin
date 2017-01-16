@@ -39,4 +39,4 @@ task createEnvironment {
     }
 }
 
-build.dependsOn createEnvironment
+compileKotlin.dependsOn createEnvironment
