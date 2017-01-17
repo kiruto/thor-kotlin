@@ -4,6 +4,7 @@ import com.exyui.thor.*
 import com.exyui.thor.core.*
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
+import org.apache.log4j.BasicConfigurator
 import org.apache.log4j.Logger
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
 
@@ -16,6 +17,10 @@ object Controller {
     private val origin = if (DEBUG) listOf(ORIGIN_DEBUG) else ORIGIN_RELEASE
 
     private val log = Logger.getLogger(javaClass)
+
+    init {
+        BasicConfigurator.configure();
+    }
 
     val info = mapOf(
             Pair("host", host),

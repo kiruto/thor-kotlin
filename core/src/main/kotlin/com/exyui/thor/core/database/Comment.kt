@@ -155,8 +155,8 @@ data class Comment private constructor(val tid: Int? = null,
                     .parameter(id)
                     .get(::Comment)
                     .isEmpty
-                    .subscribe { r ->
-                        if (r) {
+                    .subscribe {
+                        if (it) {
                             Conn.observable.update("DELETE FROM comments WHERE id=?").parameter(id).execute()
                             removeStale()
                         } else {
@@ -254,7 +254,7 @@ data class Comment private constructor(val tid: Int? = null,
                     "LEFT OUTER JOIN threads ON threads.id = tid AND comments.mode = 1 " +
                     "GROUP BY threads.uri"
             return Conn.observable.select(sql)
-                    .get { Pair(it.getString(0), it.getInt(1)) }
+                    .get { Pair(it.getString(1), it.getInt(2)) }
                     .reduce(mutableMapOf<String, Int>()) { map, pair ->
                         map.put(pair.first, pair.second)
                         map

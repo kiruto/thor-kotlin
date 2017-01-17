@@ -4,6 +4,7 @@ import com.exyui.thor.core.ctrl.Controller
 import com.exyui.thor.core.database.Comment
 import org.junit.Test
 import org.junit.Assert.*
+import rx.Observable
 
 /**
  * Created by yuriel on 1/17/17.
@@ -21,7 +22,7 @@ class TestComment {
         )
     }
 
-    private fun insert(c: Comment, uri: String): Int {
+    private fun insert(c: Comment, uri: String): Pair<Int, Comment> {
 //        return c.insert(uri).first
         return Controller.insertComment(
                 uri = uri,
@@ -31,40 +32,40 @@ class TestComment {
                 website = c.website,
                 text = c.text,
                 remoteAddr = c.remoteAddr
-        ).first
+        )
     }
 
     private fun testInsert(uri: String): Int {
         val comment = create()
-        val id = insert(comment, uri)
-        val result = Comment[id]
+        val pair = insert(comment, uri)
+        println("created: $comment")
+        println("result: ${pair.first}: ${pair.second}")
+        val result = Comment[pair.second.id!!]
         assertNotNull(result)
         result?.let {
-            assertEquals(id, it.id)
             assertEquals(comment.author, it.author)
             assertEquals(comment.email, it.email)
             assertEquals(comment.website, it.website)
-            assertEquals(comment.text, it.website)
+            assertEquals(comment.text, it.text)
             assertEquals(comment.mode, it.mode)
             assertEquals(comment.remoteAddr, it.remoteAddr)
         }
-        return id
+        return result!!.id!!
     }
 
     @Test
     fun testCRUD() {
         val TEST_RECORDS = 10000
-        val URI = "http://text.exyui.com/1"
+        val URI = "http://text.exyui.com/${randomAlphaNumOfLength(10)}"
 
         val ids = IntArray(TEST_RECORDS)
         for (i in 0..TEST_RECORDS - 1) {
             ids[i] = testInsert(URI)
         }
         assertEquals(Comment.count(URI)[0], TEST_RECORDS)
-        Comment.fetch(URI).subscribe {
-            assertNotNull(it.id)
-            Comment.delete(it.id!!)
-        }
+        val list = Comment.fetch(URI).toList().toBlocking().single()
+        assertEquals(list.size, TEST_RECORDS)
+        Observable.from(list).subscribe { Comment.delete(it.id!!) }
         assertEquals(Comment.count(URI)[0], 0)
     }
 }

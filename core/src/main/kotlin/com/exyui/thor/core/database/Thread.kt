@@ -8,9 +8,9 @@ import java.sql.ResultSet
 data class Thread private constructor(val id: Int, val uri: String, val title: String) {
 
     private constructor(rs: ResultSet): this(
-            id = rs.getInt(0),
-            uri = rs.getString(1),
-            title = rs.getString(2)
+            id = rs.getInt(1),
+            uri = rs.getString(2),
+            title = rs.getString(3)
     )
 
     companion object {
