@@ -37,7 +37,7 @@ class Controller {
             Thread[uri]
         }
 
-        val c = Comment(
+        val c = Comment.create(
                 author = esc(author),
                 email = esc(email),
                 website = urlFor(website),

@@ -15,11 +15,17 @@ import com.github.davidmoten.rx.jdbc.Database
  */
 object Conn {
 
-    private val conn: Connection by lazy { DriverManager.getConnection("jdbc:sqlite:$SQLITE_FILE") }
+    private val url = "jdbc:sqlite:$SQLITE_FILE"
+    private val conn: Connection by lazy { DriverManager.getConnection(url) }
     private val version by lazy {
         observable.select("PRAGMA user_version").getAs(Int::class.java).toBlocking().single()
     }
     val observable: Database by lazy { Database.from(conn) }
+//        get() = Database.from(url)
+
+    init {
+        Class.forName("org.sqlite.JDBC")
+    }
 
     fun stmt(sql: String, vararg args: Any): PreparedStatement {
         val stmt = conn.prepareStatement(sql)

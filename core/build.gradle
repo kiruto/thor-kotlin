@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+    testCompile group: 'junit', name: 'junit', version: libs.junit
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
     compile "org.xerial:sqlite-jdbc:$libs.sqlite_jdbc"
@@ -19,5 +21,6 @@ dependencies {
     compile "com.google.guava:guava:$libs.guava"
     compile group: 'org.apache.commons', name: 'commons-lang3', version: libs.apache_commons
     compile group: 'log4j', name: 'log4j', version: libs.log4j
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: libs.logback_classic
     compile project(':env')
 }

@@ -2,6 +2,7 @@ package com.exyui.thor.core.database
 
 import com.exyui.thor.core.Accept
 import com.exyui.thor.core.PublicApi
+import com.github.davidmoten.rx.jdbc.Database
 import com.google.common.hash.BloomFilter
 import com.google.common.hash.Funnels
 import rx.Observable
@@ -26,39 +27,51 @@ import java.sql.ResultSet
  * @param created : time in seconds since UNIX time.
  * @param modified : last modification since UNIX time, may be null.
  */
-data class Comment(val tid: Int? = null,
-                   @PublicApi val id: Int? = null,
-                   @PublicApi @Accept val parent: Int? = null,
-                   @PublicApi val created: Double? = null,
-                   @PublicApi val modified: Double? = null,
-                   val mode: Int = 0,
-                   val remoteAddr: String,
-                   @PublicApi @Accept val text: String? = null,
-                   @PublicApi @Accept val author: String? = null,
-                   @Accept val email: String? = null,
-                   @PublicApi @Accept val website: String? = null,
-                   @PublicApi val likes: Int = 0,
-                   @PublicApi val dislikes: Int = 0,
-                   val voters: ByteArray? = null) {
+data class Comment private constructor(val tid: Int? = null,
+                                       @PublicApi val id: Int? = null,
+                                       @PublicApi @Accept val parent: Int? = null,
+                                       @PublicApi val created: Double? = null,
+                                       @PublicApi val modified: Double? = null,
+                                       val mode: Int = 0,
+                                       val remoteAddr: String,
+                                       @PublicApi @Accept val text: String? = null,
+                                       @PublicApi @Accept val author: String? = null,
+                                       @Accept val email: String? = null,
+                                       @PublicApi @Accept val website: String? = null,
+                                       @PublicApi val likes: Int = 0,
+                                       @PublicApi val dislikes: Int = 0,
+                                       val voters: ByteArray? = null) {
 
     private constructor(rs: ResultSet): this(
-            tid = rs.getInt(0),
-            id = rs.getInt(1),
-            parent = rs.getInt(2),
-            created = rs.getDouble(3),
-            modified = rs.getDouble(4),
-            mode = rs.getInt(5),
-            remoteAddr = rs.getString(6),
-            text = rs.getString(7),
-            author = rs.getString(8),
-            email = rs.getString(9),
-            website = rs.getString(10),
-            likes = rs.getInt(11),
-            dislikes = rs.getInt(12),
-            voters = rs.getBytes(13)
+            tid = rs.getInt(1),
+            id = rs.getInt(2),
+            parent = rs.getInt(3),
+            created = rs.getDouble(4),
+            modified = rs.getDouble(5),
+            mode = rs.getInt(6),
+            remoteAddr = rs.getString(7),
+            text = rs.getString(8),
+            author = rs.getString(9),
+            email = rs.getString(10),
+            website = rs.getString(11),
+            likes = rs.getInt(12),
+            dislikes = rs.getInt(13),
+            voters = rs.getBytes(14)
     )
 
     companion object {
+
+        val fieldSize = 14
+
+        fun create(author: String?, email: String?, website: String?, text: String, mode: Int, remoteAddr: String): Comment {
+            return Comment(
+                    author = author,
+                    email = email,
+                    website = website,
+                    text = text,
+                    mode = mode,
+                    remoteAddr = remoteAddr)
+        }
 
         /**
          * Activate comment id if pending.
@@ -303,12 +316,12 @@ data class Comment(val tid: Int? = null,
                 .parameter(author)
                 .parameter(email)
                 .parameter(website)
-                .parameter(output.toByteArray())
+                .parameter(Database.toSentinelIfNull(output.toByteArray()))
                 .parameter(uri)
                 .execute()
         return Conn.observable.select("SELECT *, MAX(c.id) FROM comments AS c INNER JOIN threads ON threads.uri = ?")
                 .parameter(uri)
-                .get { Pair(it.getInt(it.fetchSize - 1), Comment(it)) }
+                .get { Pair(it.getInt(fieldSize + 1), Comment(it)) }
                 .toBlocking()
                 .single()
     }
