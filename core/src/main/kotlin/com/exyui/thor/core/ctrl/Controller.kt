@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
 /**
  * Created by yuriel on 1/15/17.
  */
-class Controller {
+object Controller {
 
     private val host = if (DEBUG) listOf(HOST_DEBUG) else HOST_RELEASE
     private val origin = if (DEBUG) listOf(ORIGIN_DEBUG) else ORIGIN_RELEASE
@@ -59,5 +59,9 @@ class Controller {
         url?: return null
         if (url.startsWith("https://", true) || url.startsWith("http://", true)) return url
         return "http://$url"
+    }
+
+    fun deleteComment(id: Int) {
+        Comment.delete(id)
     }
 }

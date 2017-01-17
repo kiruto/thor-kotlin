@@ -1,5 +1,6 @@
 package com.exyui.thor.core
 
+import com.exyui.thor.core.ctrl.Controller
 import com.exyui.thor.core.database.Comment
 import org.junit.Test
 import org.junit.Assert.*
@@ -21,7 +22,16 @@ class TestComment {
     }
 
     private fun insert(c: Comment, uri: String): Int {
-        return c.insert(uri).first
+//        return c.insert(uri).first
+        return Controller.insertComment(
+                uri = uri,
+                title = randomAlphaNumOfLength(3, 10),
+                author = c.author,
+                email = c.email,
+                website = c.website,
+                text = c.text,
+                remoteAddr = c.remoteAddr
+        ).first
     }
 
     private fun testInsert(uri: String): Int {

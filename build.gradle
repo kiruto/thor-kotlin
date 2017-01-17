@@ -35,3 +35,7 @@ apply from: 'local_props.gradle'
 repositories {
     mavenCentral()
 }
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

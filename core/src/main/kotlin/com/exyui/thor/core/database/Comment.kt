@@ -34,7 +34,7 @@ data class Comment private constructor(val tid: Int? = null,
                                        @PublicApi val modified: Double? = null,
                                        val mode: Int = 0,
                                        val remoteAddr: String,
-                                       @PublicApi @Accept val text: String? = null,
+                                       @PublicApi @Accept val text: String = "",
                                        @PublicApi @Accept val author: String? = null,
                                        @Accept val email: String? = null,
                                        @PublicApi @Accept val website: String? = null,
@@ -59,7 +59,7 @@ data class Comment private constructor(val tid: Int? = null,
             voters = rs.getBytes(14)
     )
 
-    companion object {
+    internal companion object {
 
         val fieldSize = 14
 
@@ -283,7 +283,7 @@ data class Comment private constructor(val tid: Int? = null,
     /**
      * Add new comment to DB and return a comment and database values.
      */
-    fun insert(uri: String): Pair<Int, Comment> {
+    internal fun insert(uri: String): Pair<Int, Comment> {
         var p: Int? = parent
         parent?.let {
             val ref = Comment[it]
