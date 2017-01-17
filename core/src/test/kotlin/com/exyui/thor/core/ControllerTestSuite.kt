@@ -11,8 +11,7 @@ import rx.Observable
  */
 
 class ControllerTestSuite {
-    @Test
-    fun testCRUD() {
+    @Test fun testCRUD() {
         val TEST_RECORDS = 10000
         val URI = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
 
@@ -72,12 +71,17 @@ class ControllerTestSuite {
     }
 
     private fun editComment(id: Int): Comment {
-        return Controller.editComment(
-                id = id,
-                text = noa(randomAlphaNumOfLength(100)),
-                website = noa(getAWebsite()),
-                author = noa(randomAlphaNumOfLength(3, 10))
-        )
+        val text = noa(randomAlphaNumOfLength(100))
+        val website = noa(getAWebsite())
+        val author = noa(randomAlphaNumOfLength(3, 10))
+        val edit = Controller.editComment(id, text, website, author)
+        val result = Controller.viewComment(id)
+        text?.let { assertEquals(it, result.text) }
+        website?.let { assertEquals(it, result.website) }
+        author?.let { assertEquals(it, result.author) }
+        assertNotNull(result.modified)
+        assertNotEquals(result.modified, .0)
+        return edit
     }
 
     private fun testInsert(uri: String): Int {
