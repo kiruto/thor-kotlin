@@ -1,12 +1,12 @@
 package com.exyui.thor.core
 
 import org.apache.commons.lang3.StringUtils.leftPad
-import org.junit.Test
 import java.lang.Math.round
 import java.lang.Math.random
 import java.lang.Math.pow
 import java.lang.Math.abs
 import java.lang.Math.min
+import java.util.Random
 
 /**
  * Created by yuriel on 1/17/17.
@@ -25,3 +25,18 @@ fun randomAlphaNumOfLength(from: Int, to: Int = 0): String {
     }
     return sb.toString()
 }
+
+/**
+ * @return true or false randomly
+ */
+fun tof(): Boolean = Random().nextBoolean()
+
+/**
+ * @return null or 1 randomly
+ */
+fun no1(): Int? = if (tof()) 1 else null
+
+/**
+ * @return null or any gives randomly
+ */
+fun <T>noa(a: T): T? = if (tof()) a else null

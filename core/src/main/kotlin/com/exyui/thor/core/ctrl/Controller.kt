@@ -31,7 +31,17 @@ object Controller {
 
     @Throws(ThorBadRequest::class)
     fun insertComment(uri: String, title: String, author: String? = null, email: String? = null, website: String? = null, text: String, remoteAddr: String): Pair<Int, Comment> {
-        val mode = if (MODERATED) 2 else 1
+        val c = Comment.create(
+                author = esc(author),
+                email = esc(email),
+                website = urlFor(website),
+                text = esc(text),
+                mode = if (MODERATED) 2 else 1,
+                remoteAddr = remoteAddr
+        )
+        val v = c.verify()
+        if (!v.valid)
+            throw ThorBadRequest(v.reason)
 
         val thread = if (uri !in Thread) {
             // todo: check title and uri by request
@@ -42,16 +52,7 @@ object Controller {
             Thread[uri]
         }
 
-        val c = Comment.create(
-                author = esc(author),
-                email = esc(email),
-                website = urlFor(website),
-                text = esc(text),
-                mode = mode,
-                remoteAddr = remoteAddr
-        )
-
-        log.info("comments.new:before-save:${c.id}")
+        log.info("comments.new:before-save:${thread.id}:${c.id}")
         val rv = c.insert(uri)
         log.info("comments.new:after-save:${rv.first}")
         return rv
@@ -68,5 +69,10 @@ object Controller {
 
     fun deleteComment(id: Int) {
         Comment.delete(id)
+    }
+
+    fun editComment(id: Int, text: String? = null, author: String? = null, website: String? = null): Comment {
+        val result = Comment.update(id, text, author, website)
+        return result
     }
 }

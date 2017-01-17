@@ -16,7 +16,6 @@ val VALID_URL_REGEX = Pattern.compile("^(http://|https://)?(www.)?([a-zA-Z0-9]+)
 data class VerifyResult(val valid: Boolean, val reason: String? = null)
 
 fun Comment.verify(): VerifyResult {
-    text?: return VerifyResult(false, "text is missing")
 
     parent?.let{ if(it <= 0) return VerifyResult(false, "invalid parent id") }
 

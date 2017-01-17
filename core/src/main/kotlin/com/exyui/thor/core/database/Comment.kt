@@ -93,6 +93,26 @@ data class Comment private constructor(val tid: Int? = null,
         }
 
         /**
+         * Update comment
+         * @param: id
+         * @return updated comment.
+         */
+        fun update(id: Int, text: String? = null, author: String? = null, website: String? = null): Comment {
+            val kv = StringBuilder()
+            text?.let { kv.append("text=?, ") }
+            author?.let{ kv.append("author=?, ") }
+            website?.let{ kv.append("website=?, ") }
+            kv.append("modified=${System.currentTimeMillis()}")
+            val ob = Conn.observable.update("UPDATE comments SET $kv WHERE id=?;")
+            text?.let { ob.parameter(it) }
+            author?.let { ob.parameter(it) }
+            website?.let { ob.parameter(it) }
+            ob.parameter(id).execute()
+
+            return get(id)!!
+        }
+
+        /**
          * Search for comment
          * @param: id
          * @return a comment.
@@ -344,7 +364,7 @@ data class Comment private constructor(val tid: Int? = null,
                 modified?.let { "modified = $modified, " } +
                 "mode = $mode, " +
                 "remoteAddr = $remoteAddr, " +
-                text?.let { "text = $text, " } +
+                text.let { "text = $text, " } +
                 author?.let { "author = $author, " } +
                 email?.let { "email = $email, " } +
                 website?.let { "website = $website, " } +
