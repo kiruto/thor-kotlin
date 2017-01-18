@@ -2,6 +2,30 @@ import groovy.json.JsonSlurper
 
 task createEnvironment {
     doLast {
+        if (use_local_properties) {
+            def file = new File(rootDir, 'local.properties')
+            if (file.exists()) {
+                Properties props = new Properties()
+                props.load(new FileInputStream("$project.rootDir/local.properties"))
+                props.each { prop ->
+                    project.ext.set(prop.key, prop.value)
+                }
+            } else {
+                println("Create local properties, this file shall never be commited.")
+                file.withWriter('utf-8') { writer ->
+                    writer.writeLine '# this file shall never be commited.'
+                    writer.writeLine '# left the field empty if you don\'t use.'
+                    writer.writeLine ''
+                    writer.writeLine '# AES key, the value must be 64 bit.'
+                    writer.writeLine 'aes_key='
+                    writer.writeLine ''
+                    writer.writeLine '# set the dsn if you use sentry'
+                    writer.writeLine 'sentry_dsn='
+                }
+                println("local properties has been created.")
+            }
+        }
+
         def slurper = new JsonSlurper()
         def hosts = slurper.parseText host
 
@@ -25,6 +49,8 @@ task createEnvironment {
             writer.writeLine "const val HOST_DEBUG = \"http://127.0.0.1\""
             writer.writeLine "const val HEAP_SIZE = ${heap_size}L"
             writer.writeLine "const val OFF_HEAP_SIZE = ${off_heap_size}L"
+            writer.writeLine "const val AES_KEY = \"$aes_key\""
+            writer.writeLine "const val SENTRY_DSN = \"${project.hasProperty('sentry_dsn')?sentry_dsn: ""}\""
             writer.writeLine "val HOST_RELEASE = listOf("
             hosts.eachWithIndex { val, idx ->
                 writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")

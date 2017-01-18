@@ -18,12 +18,12 @@ class CryptoTestSuite {
 
     @Test fun testEncode() {
         val r = encrypt(text = content, key = key)
-        assertEquals(disEncrypt(text = r, key = key), content)
+        assertEquals(decrypt(text = r, key = key), content)
     }
 
     @Test fun testDecode() {
         result.forEach {
-            assertEquals(disEncrypt(text = it, key = key), content)
+            assertEquals(decrypt(text = it, key = key), content)
         }
     }
 }
