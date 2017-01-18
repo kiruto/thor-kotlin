@@ -30,9 +30,17 @@ object Controller {
     )
 
     @Throws(ThorBadRequest::class)
-    fun insertComment(uri: String, title: String, author: String? = null, email: String? = null, website: String? = null, text: String, remoteAddr: String): Pair<Int, Comment> {
+    fun insertComment(uri: String,
+                      title: String,
+                      author: String? = null,
+                      email: String? = null,
+                      website: String? = null,
+                      text: String,
+                      remoteAddr: String,
+                      parent: Int? = null): Pair<Int, Comment> {
         val c = Comment.create(
                 author = esc(author),
+                parent = parent,
                 email = esc(email),
                 website = urlFor(website),
                 text = esc(text),

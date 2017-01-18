@@ -20,7 +20,9 @@ object Conn {
     private val version by lazy {
         observable.select("PRAGMA user_version").getAs(Int::class.java).toBlocking().single()
     }
-    val observable: Database by lazy { Database.from(conn) }
+    val observable: Database by lazy {
+        Database.builder().url(url).pool(1, 100).build()
+    }
 //        get() = Database.from(url)
 
     init {

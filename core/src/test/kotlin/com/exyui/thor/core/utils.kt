@@ -6,7 +6,7 @@ import java.lang.Math.random
 import java.lang.Math.pow
 import java.lang.Math.abs
 import java.lang.Math.min
-import java.util.Random
+import java.util.*
 
 /**
  * Created by yuriel on 1/17/17.
@@ -26,17 +26,30 @@ fun randomAlphaNumOfLength(from: Int, to: Int = 0): String {
     return sb.toString()
 }
 
+fun <T> List<T>.anyOne(): T? {
+    if (isEmpty()) return null
+    val i = Random().nextInt(size)
+    return this[i]
+}
+
+fun <T> List<T>.aon(): T? = aon(this.anyOne())
+fun <T> List<T>.shuffle(): List<T> {
+    val seed = System.nanoTime()
+    Collections.shuffle(this, Random(seed))
+    return this
+}
+
 /**
  * @return true or false randomly
  */
 fun tof(): Boolean = Random().nextBoolean()
 
 /**
- * @return null or 1 randomly
+ * @return true or null randomly
  */
-fun no1(): Int? = if (tof()) 1 else null
+fun ton(): Boolean? = if (tof()) true else null
 
 /**
- * @return null or any gives randomly
+ * @return an Object gives or null randomly
  */
-fun <T>noa(a: T): T? = if (tof()) a else null
+fun <T> aon(a: T?): T? = if (tof()) a else null

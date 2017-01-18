@@ -63,9 +63,10 @@ data class Comment private constructor(val tid: Int? = null,
 
         val fieldSize = 14
 
-        fun create(author: String?, email: String?, website: String?, text: String, mode: Int, remoteAddr: String): Comment {
+        fun create(author: String?, parent: Int?, email: String?, website: String?, text: String, mode: Int, remoteAddr: String): Comment {
             return Comment(
                     author = author,
+                    parent = parent,
                     email = email,
                     website = website,
                     text = text,
@@ -232,7 +233,7 @@ data class Comment private constructor(val tid: Int? = null,
 
             val voteQry = if (upvote) "likes = likes + 1" else "dislikes = dislikes + 1"
             Conn.observable.update("UPDATE comments SET $voteQry voters = ? WHERE id=?;")
-                    .parameter(output.toByteArray())
+                    .parameter(Database.toSentinelIfNull(output.toByteArray()))
                     .parameter(id)
                     .execute()
             if (upvote)
