@@ -23,6 +23,8 @@ task createEnvironment {
             writer.writeLine ""
             writer.writeLine "const val PACKAGE_VERSION = \"$version\""
             writer.writeLine "const val HOST_DEBUG = \"http://127.0.0.1\""
+            writer.writeLine "const val HEAP_SIZE = ${heap_size}L"
+            writer.writeLine "const val OFF_HEAP_SIZE = ${off_heap_size}L"
             writer.writeLine "val HOST_RELEASE = listOf("
             hosts.eachWithIndex { val, idx ->
                 writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")

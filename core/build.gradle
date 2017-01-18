@@ -23,6 +23,8 @@ dependencies {
     compile group: 'log4j', name: 'log4j', version: libs.log4j
     compile group: 'ch.qos.logback', name: 'logback-classic', version: libs.logback_classic
     compile group: 'com.zaxxer', name: 'HikariCP', version: libs.hikari
+    compile group: 'org.ehcache', name: 'ehcache', version: libs.ehcache
+
 
     compile project(':env')
 }
