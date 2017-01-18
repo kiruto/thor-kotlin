@@ -14,6 +14,7 @@ import java.security.SecureRandom
 
 /**
  * Created by yuriel on 1/16/17.
+ * @see: http://exyui.com/article/4/%E4%BD%BF%E7%94%A8crypto-js%E4%B8%8EPyCrypto%E6%89%93%E9%80%A0%E7%9B%B8%E5%AF%B9%E5%AE%89%E5%85%A8%E7%9A%84%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE
  */
 
 /**
@@ -45,8 +46,10 @@ fun encrypt(text: String, key: String = AES_KEY): String {
     val ivHex = iv.toHex()
     val ivh = ivHex.substring(0, 16)
     val ive = ivHex.substring(16)
-    return ive + String(Base64.getEncoder().encode(encrypted)) + ivh
+    return "$ive${String(Base64.getEncoder().encode(encrypted))}$ivh"
 }
+
+fun String.encrypt(): String = encrypt(this)
 
 fun decrypt(text: String, key: String = AES_KEY): String {
     unlocked
@@ -58,9 +61,10 @@ fun decrypt(text: String, key: String = AES_KEY): String {
     val ivSpec = IvParameterSpec(iv.toBytes())
     cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
     val original = cipher.doFinal(bytes)
-    val originalString = String(original)
-    return originalString.trim()
+    return String(original).trim()
 }
+
+fun String.decrypt() = decrypt(this)
 
 private fun String.toBytes(): ByteArray {
     return DatatypeConverter.parseHexBinary(this)

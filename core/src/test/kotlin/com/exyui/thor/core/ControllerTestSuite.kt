@@ -16,7 +16,7 @@ class ControllerTestSuite {
     }
 
     @Test fun testMultipleThreadCRUD() {
-        Observable.from(0..100)
+        Observable.from(0..10)
                 .map { getAURL() }
                 .subscribe { testSingleThreadCRUD(it) }
     }

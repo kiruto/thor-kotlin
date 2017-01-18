@@ -347,8 +347,6 @@ data class Comment private constructor(val tid: Int? = null,
                 .single()
     }
 
-    val hash = (email + remoteAddr).hashCode()
-
     override fun hashCode(): Int {
         return toString().hashCode()
     }
