@@ -7,6 +7,9 @@ import java.lang.Math.pow
 import java.lang.Math.abs
 import java.lang.Math.min
 import java.util.*
+import java.util.Random
+
+
 
 /**
  * Created by yuriel on 1/17/17.
@@ -53,3 +56,13 @@ fun ton(): Boolean? = if (tof()) true else null
  * @return an Object gives or null randomly
  */
 fun <T> aon(a: T?): T? = if (tof()) a else null
+
+fun getRandomHexString(numchars: Int): String {
+    val r = Random()
+    val sb = StringBuffer()
+    while (sb.length < numchars) {
+        sb.append(Integer.toHexString(r.nextInt()))
+    }
+
+    return sb.toString().substring(0, numchars)
+}

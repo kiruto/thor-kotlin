@@ -7,7 +7,7 @@ import org.ehcache.config.builders.CacheManagerBuilder
 /**
  * Created by yuriel on 1/18/17.
  */
-class ThorCache internal constructor(private val cacheManager: CacheManager, alias: String) {
+class ThorCache internal constructor(cacheManager: CacheManager, alias: String) {
 
     internal val cache: Cache<String, String?> = cacheManager.getCache(alias, String::class.java, String::class.java)
 
@@ -48,6 +48,6 @@ class ThorCache internal constructor(private val cacheManager: CacheManager, ali
     }
 
     fun close() {
-        cacheManager.removeCache("preConfigured")
+        cache.clear()
     }
 }

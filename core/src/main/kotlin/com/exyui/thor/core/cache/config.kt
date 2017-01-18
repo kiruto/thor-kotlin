@@ -12,4 +12,4 @@ import org.ehcache.config.units.MemoryUnit
 val cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder(
         String::class.java, String::class.java,
         heap(HEAP_SIZE).offheap(OFF_HEAP_SIZE, MemoryUnit.MB)
-).build()
+).build()!!
