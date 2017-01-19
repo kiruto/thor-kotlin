@@ -1,2 +1,2 @@
 rootProject.name = 'thor-kotlin'
-include ':core', ':servlet', ":crypto", ":env"
+include ':core', ':servlet', ":crypto", ":env", ":testkits"

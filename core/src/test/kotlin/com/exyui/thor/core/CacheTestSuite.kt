@@ -1,6 +1,7 @@
 package com.exyui.thor.core
 
 import com.exyui.thor.core.cache.ThorCache
+import com.exyui.testkits.*
 import org.junit.Test
 import org.junit.Assert.*
 import rx.Observable

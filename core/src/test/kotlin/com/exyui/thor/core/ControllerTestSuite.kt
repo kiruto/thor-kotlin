@@ -2,6 +2,7 @@ package com.exyui.thor.core
 
 import com.exyui.thor.core.ctrl.Controller
 import com.exyui.thor.core.database.Comment
+import com.exyui.testkits.*
 import org.junit.Test
 import org.junit.Assert.*
 import rx.Observable

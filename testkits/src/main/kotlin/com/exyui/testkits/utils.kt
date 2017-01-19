@@ -1,4 +1,4 @@
-package com.exyui.thor.core
+package com.exyui.testkits
 
 import org.apache.commons.lang3.StringUtils.leftPad
 import java.lang.Math.round
