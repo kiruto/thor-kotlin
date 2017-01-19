@@ -59,9 +59,12 @@ fun decrypt(text: String, key: String = AES_KEY): String {
     val cipher = Cipher.getInstance("AES/CFB/NoPadding")
     val keySpec = if (key == AES_KEY) defaultKeySpec else SecretKeySpec(key.toBytes(), "AES")
     val ivSpec = IvParameterSpec(iv.toBytes())
-    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
-    val original = cipher.doFinal(bytes)
-    return String(original).trim()
+    try {
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+        return String(cipher.doFinal(bytes)).trim()
+    } catch (e: Exception) {
+        throw BadSignatureException()
+    }
 }
 
 fun String.decrypt() = decrypt(this)
@@ -78,3 +81,5 @@ private fun ByteArray.toHex(): String {
     }
     return hex.toString()
 }
+
+class BadSignatureException: Exception()

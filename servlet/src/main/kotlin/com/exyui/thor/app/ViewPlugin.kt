@@ -1,13 +1,15 @@
-package com.exyui.thor.core.plugin
+package com.exyui.thor.app
 
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
+import com.exyui.thor.core.plugin.OnNewComment
+import com.exyui.thor.core.plugin.active
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
  * Created by yuriel on 1/19/17.
  */
-internal object CorePlugin: OnNewComment {
+internal object ViewPlugin : OnNewComment {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 

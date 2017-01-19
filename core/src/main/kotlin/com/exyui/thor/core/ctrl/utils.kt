@@ -1,6 +1,9 @@
 package com.exyui.thor.core.ctrl
 
 import com.exyui.thor.core.database.Comment
+import com.google.common.net.InetAddresses
+import java.net.Inet4Address
+import java.net.Inet6Address
 import java.util.regex.Pattern
 import java.util.regex.Pattern.CASE_INSENSITIVE
 
@@ -44,4 +47,18 @@ fun Comment.verify(): VerifyResult {
     }
 
     return VerifyResult(true)
+}
+
+/**
+ * Anonymize IPv4 and IPv6 :param remote_addr: to /24 (zero'd)
+ * and /48 (zero'd).
+ */
+internal fun String.anonymize(): String {
+    val ip = InetAddresses.forString(this)
+    val addr = ip.hostAddress
+    return when(ip) {
+        is Inet6Address -> addr.split(":").subList(0, 4).joinToString(":") { it } + ":0:0:0:0"
+        is Inet4Address -> addr.split(".").subList(0, 3).joinToString(".") { it } + ".0"
+        else -> "0.0.0.0"
+    }
 }

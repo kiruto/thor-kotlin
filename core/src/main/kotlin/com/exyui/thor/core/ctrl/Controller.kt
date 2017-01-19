@@ -6,7 +6,6 @@ import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
 import com.exyui.thor.core.plugin.Bus
 import com.exyui.thor.core.plugin.COMMENT
-import com.exyui.thor.core.plugin.CorePlugin
 import com.exyui.thor.core.plugin.LIFE.*
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
 
@@ -17,10 +16,6 @@ object Controller {
 
     private val host = if (DEBUG) listOf(HOST_DEBUG) else HOST_RELEASE
     private val origin = if (DEBUG) listOf(ORIGIN_DEBUG) else ORIGIN_RELEASE
-
-    init {
-        CorePlugin
-    }
 
     val info = mapOf(
             Pair("host", host),
@@ -54,17 +49,14 @@ object Controller {
         val thread = if (uri !in Thread) {
             // todo: check title and uri by request
             val t = Thread.new(uri, title)
-//            log.info("comments.new:new-thread:${t.id}")
             Bus.p(COMMENT.NEW, NEW_THREAD, t)
             t
         } else {
             Thread[uri]
         }
 
-//        log.info("comments.new:before-save:${thread.id}:${c.id}")
         Bus.p(COMMENT.NEW, BEFORE_SAVE, thread, c)
         val rv = c.insert(uri)
-//        log.info("comments.new:after-save:${rv.first}")
         Bus.p(COMMENT.NEW, AFTER_SAVE, rv.second)
         return rv
     }
