@@ -44,13 +44,13 @@ internal object Bus {
         when(event.target) {
             COMMENT.NEW -> {
                 when(event.life) {
-                    LIFE.NEW_THREAD -> commentPlugin.forEach { it.onNewThread(event.data as Thread) }
+                    LIFE.NEW_THREAD -> commentPlugin.forEach { it.onNewThread(event.what() as Thread) }
                     LIFE.BEFORE_SAVE -> commentPlugin.forEach {
-                        val t = (event.data as Array<*>)[0] as Thread
+                        val t = event.data[0] as Thread
                         val c = event.data[1] as Comment
                         it.beforeSave(t, c)
                     }
-                    LIFE.AFTER_SAVE -> commentPlugin.forEach { it.afterSave(event.data as Comment) }
+                    LIFE.AFTER_SAVE -> commentPlugin.forEach { it.afterSave(event.what() as Comment) }
                 }
             }
         }

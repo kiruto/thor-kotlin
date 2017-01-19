@@ -51,6 +51,8 @@ task createEnvironment {
             writer.writeLine "const val OFF_HEAP_SIZE = ${off_heap_size}L"
             writer.writeLine "const val AES_KEY = \"$aes_key\""
             writer.writeLine "const val SENTRY_DSN = \"${project.hasProperty('sentry_dsn')?sentry_dsn: ""}\""
+            writer.writeLine "const val LOG_PATH = \"$rootDir/$log_path\""
+            writer.writeLine "const val LOG_MAX_SIZE = \"$log_max_size\""
             writer.writeLine "val HOST_RELEASE = listOf("
             hosts.eachWithIndex { val, idx ->
                 writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")

@@ -87,7 +87,7 @@ data class Comment private constructor(val tid: Int? = null,
         fun update(id: Int, data: Comment): Comment {
             Conn.observable
                     .update("UPDATE comments SET ? WHERE id=?;")
-                    .parameter(data.toString())
+                    .parameter(data.toKVString())
                     .parameter(id)
                     .execute()
             return get(id)!!
@@ -355,18 +355,18 @@ data class Comment private constructor(val tid: Int? = null,
         return toString() == other?.toString()
     }
 
-    override fun toString(): String {
-        return tid?.let { "tid = $tid, " } +
-                id?.let { "id = $id, " } +
-                parent?.let { "parent = $parent, " } +
-                created?.let { "created = $created, " } +
-                modified?.let { "modified = $modified, " } +
+    fun toKVString(): String {
+        return tid?.let { "tid = $tid, " }.orEmpty() +
+                id?.let { "id = $id, " }.orEmpty() +
+                parent?.let { "parent = $parent, " }.orEmpty() +
+                created?.let { "created = $created, " }.orEmpty() +
+                modified?.let { "modified = $modified, " }.orEmpty() +
                 "mode = $mode, " +
                 "remoteAddr = $remoteAddr, " +
-                text.let { "text = $text, " } +
-                author?.let { "author = $author, " } +
-                email?.let { "email = $email, " } +
-                website?.let { "website = $website, " } +
+                "text = $text, " +
+                author?.let { "author = $author, " }.orEmpty() +
+                email?.let { "email = $email, " }.orEmpty() +
+                website?.let { "website = $website, " }.orEmpty() +
                 "likes = $likes, " +
                 "dislikes = $dislikes"
     }

@@ -10,7 +10,7 @@ buildscript {
                 rxjava_jdbc: '0.7.3',
                 guava: '19.0',
                 apache_commons: '3.5',
-                log4j: '1.2.17',
+                log4j: '2.7',
                 javaee: '7.0',
                 servlet: '3.1.0',
                 logback_classic: '1.1.8',

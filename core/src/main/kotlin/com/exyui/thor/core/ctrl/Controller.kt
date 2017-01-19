@@ -8,8 +8,6 @@ import com.exyui.thor.core.plugin.Bus
 import com.exyui.thor.core.plugin.COMMENT
 import com.exyui.thor.core.plugin.CorePlugin
 import com.exyui.thor.core.plugin.LIFE.*
-import org.apache.log4j.BasicConfigurator
-import org.apache.log4j.Logger
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
 
 /**
@@ -22,7 +20,6 @@ object Controller {
 
     init {
         CorePlugin
-        BasicConfigurator.configure()
     }
 
     val info = mapOf(

@@ -20,6 +20,16 @@ internal enum class LIFE(private val alias: String) {
     override fun toString(): String = alias
 }
 
-internal data class Event(val target: TARGET, val life: LIFE, val data: Any) {
+internal data class Event(val target: TARGET, val life: LIFE, val data: Array<out Any>) {
+    fun what() = data[0]
+
+    override fun hashCode(): Int {
+        return toString().hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return toString() == other?.toString()
+    }
+
     override fun toString() = "$target:$life:$data"
 }

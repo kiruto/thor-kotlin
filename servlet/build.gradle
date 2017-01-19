@@ -18,7 +18,8 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
-    compile group: 'log4j', name: 'log4j', version: libs.log4j
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: libs.log4j
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: libs.log4j
     compile group: 'javax', name: 'javaee-api', version: libs.javaee
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: libs.servlet
     compile project(':core')
