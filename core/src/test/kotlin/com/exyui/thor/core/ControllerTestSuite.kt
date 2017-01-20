@@ -32,11 +32,20 @@ class ControllerTestSuite {
         assertEquals(comment.dislikes, 0)
 
         Observable.from(listOf("192.168.1.1", "192.168.1.4", "192.168.1.255", "192.168.2.1"))
-                .map { Controller.like(id, it) }
+                .map {
+                    Controller.like(id, it)
+                    it
+                }
                 .toList()
+                .flatMap {
+                    val c = Controller.viewComment(id)
+                    assertEquals(c.likes, 2)
+                    assertEquals(c.dislikes, 0)
+                    Observable.from(it)
+                }
+                .map { Controller.dislike(id, it) }
                 .subscribe {
                     val c = Controller.viewComment(id)
-                    println("comment: $c")
                     assertEquals(c.likes, 2)
                     assertEquals(c.dislikes, 0)
                 }
@@ -45,11 +54,20 @@ class ControllerTestSuite {
                 "1234:2234:3234:4234:523a:6234:7b34:8c34",
                 "1234:2234:3234:4234:5d34:6e34:7204:8234",
                 "1234:2234:3234:4235:5234:6234:7234:8234"))
-                .map { Controller.dislike(id, it) }
+                .map {
+                    Controller.dislike(id, it)
+                    it
+                }
                 .toList()
+                .flatMap {
+                    val c = Controller.viewComment(id)
+                    assertEquals(c.likes, 2)
+                    assertEquals(c.dislikes, 2)
+                    Observable.from(it)
+                }
+                .map { Controller.like(id, it) }
                 .subscribe {
                     val c = Controller.viewComment(id)
-                    println("comment: $c")
                     assertEquals(c.likes, 2)
                     assertEquals(c.dislikes, 2)
                 }
