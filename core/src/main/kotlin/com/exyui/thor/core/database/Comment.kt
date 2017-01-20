@@ -6,6 +6,7 @@ import com.github.davidmoten.rx.jdbc.Database
 import com.google.common.hash.BloomFilter
 import com.google.common.hash.Funnels
 import rx.Observable
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.sql.ResultSet
 
@@ -216,23 +217,28 @@ data class Comment private constructor(val tid: Int? = null,
             val c = Conn.observable
                     .select("SELECT likes, dislikes, voters FROM comments WHERE id=?")
                     .parameter(id)
-                    .get { Comment(likes = it.getInt(0), dislikes = it.getInt(1), voters = it.getBytes(2), remoteAddr = "") }
+                    .get { Comment(likes = it.getInt(1), dislikes = it.getInt(2), voters = it.getBytes(3), remoteAddr = "") }
                     .toBlocking()
                     .first()
             if (c.likes + c.dislikes >= 142)
                 return Vote(c.likes, c.dislikes)
 
-            val bf = getBloomFilter(c.likes + c.dislikes)
-            bf.put(c.voters)
-            if (bf.mightContain(remoteAddr.toByteArray()))
-                return Vote(c.likes, c.dislikes)
+            val bf: BloomFilter<ByteArray>
+            if (null != c.voters) {
+                bf = readBloomFilter(c.voters)
+                if (bf.mightContain(remoteAddr.toByteArray()))
+                    return Vote(c.likes, c.dislikes)
+            } else {
+                bf = createBloomFilter(c.likes + c.dislikes)
+            }
 
+            bf.put(c.voters)
             bf.put(remoteAddr.toByteArray())
             val output = ByteArrayOutputStream()
             bf.writeTo(output)
 
             val voteQry = if (upvote) "likes = likes + 1" else "dislikes = dislikes + 1"
-            Conn.observable.update("UPDATE comments SET $voteQry voters = ? WHERE id=?;")
+            Conn.observable.update("UPDATE comments SET $voteQry, voters = ? WHERE id=?;")
                     .parameter(Database.toSentinelIfNull(output.toByteArray()))
                     .parameter(id)
                     .execute()
@@ -242,7 +248,11 @@ data class Comment private constructor(val tid: Int? = null,
                 return Vote(c.likes, c.dislikes + 1)
         }
 
-        private fun getBloomFilter(size: Int): BloomFilter<ByteArray> {
+        private fun readBloomFilter(bytes: ByteArray): BloomFilter<ByteArray> {
+            return BloomFilter.readFrom(ByteArrayInputStream(bytes), Funnels.byteArrayFunnel())
+        }
+
+        private fun createBloomFilter(size: Int): BloomFilter<ByteArray> {
             return BloomFilter.create(Funnels.byteArrayFunnel(), size)
         }
 
@@ -313,7 +323,7 @@ data class Comment private constructor(val tid: Int? = null,
             }
         }
 
-        val bf = getBloomFilter(1)
+        val bf = createBloomFilter(1)
         bf.put(remoteAddr.toByteArray())
         val output = ByteArrayOutputStream()
         bf.writeTo(output)

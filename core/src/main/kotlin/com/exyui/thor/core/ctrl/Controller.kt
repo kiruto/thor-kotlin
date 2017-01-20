@@ -40,7 +40,7 @@ object Controller {
                 website = urlFor(website),
                 text = esc(text),
                 mode = if (MODERATED) 2 else 1,
-                remoteAddr = remoteAddr
+                remoteAddr = remoteAddr.anonymize()
         )
         val v = c.verify()
         if (!v.valid)
@@ -78,4 +78,10 @@ object Controller {
         val result = Comment.update(id, text, author, website)
         return result
     }
+
+    fun like(id: Int, remoteAddr: String) = Comment.vote(true, id, remoteAddr.anonymize())
+    fun dislike(id: Int, remoteAddr: String) = Comment.vote(false, id, remoteAddr.anonymize())
+    fun counts(vararg uri: String): IntArray =  Comment.count(*uri)
+    fun count(uri: String): Int = counts(uri)[0]
+
 }
