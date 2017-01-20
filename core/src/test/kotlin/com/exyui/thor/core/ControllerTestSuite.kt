@@ -6,6 +6,7 @@ import com.exyui.testkits.*
 import org.junit.Test
 import org.junit.Assert.*
 import rx.Observable
+import java.util.*
 
 /**
  * Created by yuriel on 1/17/17.
@@ -70,6 +71,26 @@ class ControllerTestSuite {
                     val c = Controller.viewComment(id)
                     assertEquals(c.likes, 2)
                     assertEquals(c.dislikes, 2)
+                }
+    }
+
+    @Test fun testCount() {
+        Observable.from(0..10)
+                .map {
+                    val url = getAURL()
+                    val times = Random().nextInt(10)
+                    countComment(url, times)
+                    Pair(url, times)
+                }
+                .reduce(Pair(mutableListOf<String>(), mutableListOf<Int>())) { result, it ->
+                    result.first.add(it.first)
+                    result.second.add(it.second)
+                    result
+                }
+                .subscribe {
+                    Controller.counts(*it.first.toTypedArray()).forEachIndexed { idx, v ->
+                        assertEquals(v, it.second[idx])
+                    }
                 }
     }
 
@@ -176,6 +197,15 @@ class ControllerTestSuite {
         val c = editList.anyOne()
         println("look for any one from uri=$uri: $c")
         return c
+    }
+
+    private fun countComment(url: String, times: Int) {
+        var count = 0
+        kotlin.repeat(times) {
+            insertComment(createComment(url), url)
+            count ++
+            assertEquals(Controller.count(url), count)
+        }
     }
 
     private fun getAWebsite() = "http://${randomAlphaNumOfLength(3, 10)}.com"
