@@ -15,23 +15,23 @@ import kotlin.reflect.KClass
 
 class ControllerTestSuite {
     @Test fun testSingleThreadCRUD() {
-        testSingleThreadCRUD(getAURL())
+        testSingleThreadCRUD(randomURL())
     }
 
     @Test fun testMultipleThreadCRUD() {
         Observable.from(0..10)
-                .map { getAURL() }
+                .map { randomURL() }
                 .subscribe { testSingleThreadCRUD(it) }
     }
 
     @Test fun testLike() {
-        val url = getAURL()
+        val url = randomURL()
         val comment = insertComment(createComment(url), url).second
         assertNotNull(comment.id)
         val id = comment.id!!
         assertNotEquals(id, 0)
-        assertEquals(comment.likes, 0)
-        assertEquals(comment.dislikes, 0)
+        comment.likes mustEq 0
+        comment.dislikes mustEq 0
 
         Observable.from(listOf("192.168.1.1", "192.168.1.4", "192.168.1.255", "192.168.2.1"))
                 .map {
@@ -41,15 +41,15 @@ class ControllerTestSuite {
                 .toList()
                 .flatMap {
                     val c = Controller.viewComment(id)
-                    assertEquals(c.likes, 2)
-                    assertEquals(c.dislikes, 0)
+                    c.likes mustEq 2
+                    c.dislikes mustEq 0
                     Observable.from(it)
                 }
                 .map { Controller.dislike(id, it) }
                 .subscribe {
                     val c = Controller.viewComment(id)
-                    assertEquals(c.likes, 2)
-                    assertEquals(c.dislikes, 0)
+                    c.likes mustEq 2
+                    c.dislikes mustEq 0
                 }
 
         Observable.from(listOf("1234:2234:3234:4234:5234:6234:7234:8234",
@@ -63,22 +63,22 @@ class ControllerTestSuite {
                 .toList()
                 .flatMap {
                     val c = Controller.viewComment(id)
-                    assertEquals(c.likes, 2)
-                    assertEquals(c.dislikes, 2)
+                    c.likes mustEq 2
+                    c.dislikes mustEq 2
                     Observable.from(it)
                 }
                 .map { Controller.like(id, it) }
                 .subscribe {
                     val c = Controller.viewComment(id)
-                    assertEquals(c.likes, 2)
-                    assertEquals(c.dislikes, 2)
+                    c.likes mustEq 2
+                    c.dislikes mustEq 2
                 }
     }
 
     @Test fun testCount() {
         Observable.from(0..10)
                 .map {
-                    val url = getAURL()
+                    val url = randomURL()
                     val times = Random().nextInt(10)
                     countComment(url, times)
                     Pair(url, times)
@@ -90,13 +90,13 @@ class ControllerTestSuite {
                 }
                 .subscribe {
                     Controller.counts(*it.first.toTypedArray()).forEachIndexed { idx, v ->
-                        assertEquals(v, it.second[idx])
+                        v mustEq it.second[idx]
                     }
                 }
     }
 
     @Test fun testVerify() {
-        val url = getAWebsite()
+        val url = randomWebsite()
         Observable.from(listOf(
                 createComment(url, parent = -1),
                 createComment(url, text = ""),
@@ -108,7 +108,7 @@ class ControllerTestSuite {
                 createComment(url, website = ""),
                 createComment(url, website = "fdsialbgileb.1")))
                 .subscribe {
-                    err(ThorBadRequest::class) {
+                    assertErr(ThorBadRequest::class) {
                         insertComment(it, url)
                     }
                 }
@@ -121,11 +121,11 @@ class ControllerTestSuite {
         for (i in 0..TEST_RECORDS - 1) {
             ids.add(testInsert(uri))
         }
-        assertEquals(Comment.count(uri)[0], TEST_RECORDS)
-        assertEquals(ids.size, TEST_RECORDS)
+        Comment.count(uri)[0] mustEq TEST_RECORDS
+        ids.size mustEq TEST_RECORDS
 
         val editList = Comment.fetch(uri).toList().toBlocking().single()
-        assertEquals(editList.size, TEST_RECORDS)
+        editList.size mustEq TEST_RECORDS
         Observable.from(editList.shuffle()).subscribe ({
             assertNotNull(it.id)
             it.id?.let {
@@ -135,7 +135,7 @@ class ControllerTestSuite {
         })
 
         val deleteList = Comment.fetch(uri).toList().toBlocking().single()
-        assertEquals(deleteList.size, TEST_RECORDS)
+        deleteList.size mustEq TEST_RECORDS
         Observable.from(deleteList.shuffle()).subscribe {
             assertNotNull(it.id)
             it.id?.let {
@@ -144,16 +144,16 @@ class ControllerTestSuite {
                 ids.remove(it)
             }
         }
-        assertEquals(Comment.count(uri)[0], 0)
-        assertEquals(ids.size, 0)
+        Comment.count(uri)[0] mustEq 0
+        ids.size mustEq 0
     }
 
     private fun createComment(
             uri: String,
             author: String = randomAlphaNumOfLength(3, 10),
             parent: Int? = aon(getRandomComment(uri)?.id),
-            email: String = getAEmail(),
-            website: String = getAWebsite(),
+            email: String = randomEmail(),
+            website: String = randomWebsite(),
             text: String = randomAlphaNumOfLength(3, 100),
             mode: Int = 1,
             remoteAddr: String = "127.0.0.1"): Comment {
@@ -183,14 +183,14 @@ class ControllerTestSuite {
 
     private fun editComment(id: Int): Comment {
         val text = aon(randomAlphaNumOfLength(100))
-        val website = aon(getAWebsite())
+        val website = aon(randomWebsite())
         val author = aon(randomAlphaNumOfLength(3, 10))
         val edit = Controller.editComment(id = id, text = text, author = author, website = website)
         val result = Controller.viewComment(id)
         try {
-            text?.let { assertEquals(it, result.text) }
-            website?.let { assertEquals(it, result.website) }
-            author?.let { assertEquals(it, result.author) }
+            text?.let { it mustEq result.text }
+            website?.let { it mustEq result.website }
+            author?.let { it mustEq result.author }
             assertNotNull(result.modified)
             assertNotEquals(result.modified, .0)
             return edit
@@ -210,12 +210,12 @@ class ControllerTestSuite {
         val result = Comment[pair.second.id!!]
         assertNotNull(result)
         result?.let {
-            assertEquals(comment.author, it.author)
-            assertEquals(comment.email, it.email)
-            assertEquals(comment.website, it.website)
-            assertEquals(comment.text, it.text)
-            assertEquals(comment.mode, it.mode)
-            assertEquals(comment.remoteAddr, it.remoteAddr)
+            comment.author mustEq it.author
+            comment.email mustEq it.email
+            comment.website mustEq it.website
+            comment.text mustEq it.text
+            comment.mode mustEq it.mode
+            comment.remoteAddr mustEq it.remoteAddr
         }
         return result!!.id!!
     }
@@ -232,23 +232,9 @@ class ControllerTestSuite {
         kotlin.repeat(times) {
             insertComment(createComment(url), url)
             count ++
-            assertEquals(Controller.count(url), count)
+            Controller.count(url) mustEq count
         }
     }
 
-    private fun getAWebsite() = "http://${randomAlphaNumOfLength(3, 10)}.com"
-    private fun getAURL() = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
-    private fun getAEmail() = "${randomAlphaNumOfLength(3, 10)}@${randomAlphaNumOfLength(3, 10)}.com"
-
-    private fun err(e: KClass<out ThorException>, func: () -> Unit) {
-        var catches = false
-        try {
-            func.invoke()
-        } catch (ex: ThorException) {
-            assertEquals(e.java, ex.javaClass)
-            println(ex.message)
-            catches = true
-        }
-        assertTrue(catches)
-    }
+    private fun randomURL() = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
 }

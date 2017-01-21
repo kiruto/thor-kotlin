@@ -1,17 +1,24 @@
 package com.exyui.testkits
 
 import org.apache.commons.lang3.StringUtils.leftPad
+import org.junit.Assert.*
 import java.lang.Math.round
 import java.lang.Math.random
 import java.lang.Math.pow
 import java.lang.Math.abs
 import java.lang.Math.min
 import java.util.*
+import kotlin.reflect.KClass
 
 
 /**
  * Created by yuriel on 1/17/17.
  */
+
+fun randomIPV4(): String = (0..3).joinToString(".") { Random().nextInt(255).toString() }
+fun randomIPV6(): String = (0..7).joinToString(":") { Integer.toHexString(Random().nextInt(65535)) }
+fun randomIP(): String = aon(randomIPV4())?: randomIPV6()
+
 fun randomAlphaNumOfLength(from: Int, to: Int = 0): String {
     val length = if (to - from > 0)
         (Math.random() * 100 % (to - from)).toInt() + from
@@ -63,4 +70,29 @@ fun getRandomHexString(numchars: Int): String {
     }
 
     return sb.toString().substring(0, numchars)
+}
+
+fun randomWebsite() = "http://${randomAlphaNumOfLength(3, 10)}.com"
+fun randomEmail() = "${randomAlphaNumOfLength(3, 10)}@${randomAlphaNumOfLength(3, 10)}.com"
+
+fun err(e: KClass<out Throwable>, func: () -> Unit): Boolean {
+    try {
+        func.invoke()
+    } catch (ex: Throwable) {
+        println(ex.message)
+        return e.java == ex.javaClass
+    }
+    return false
+}
+
+fun assertErr(e: KClass<out Throwable>, func: () -> Unit) {
+    assertTrue(err(e, func))
+}
+
+infix fun Any?.mustEq(other: Any?) {
+    assertEquals(this, other)
+}
+
+infix fun Any?.mustNot(other: Any?) {
+    assertNotEquals(this, other)
 }

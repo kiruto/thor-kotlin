@@ -10,7 +10,7 @@ import rx.Observable
  * Created by yuriel on 1/18/17.
  */
 class CacheTestSuite {
-    @Test fun insert() {
+    @Test fun test() {
         Observable.from(0..10)
                 .flatMap {
                     val cache = randomAlphaNumOfLength(3, 10)

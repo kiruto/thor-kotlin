@@ -57,6 +57,7 @@ private fun getRandomIV(): ByteArray {
 }
 
 fun String.forceEnc() = encryptWithIV(this, getRandomIV())
+fun String.encryptWith(iv: String) = encryptWithIV(this, iv.toBytes()).r
 
 /**
  * Decrypt string with a special IV
