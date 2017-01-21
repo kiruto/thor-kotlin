@@ -39,12 +39,20 @@ class ThorCache internal constructor(cacheManager: CacheManager, alias: String) 
     }
 
     operator fun get(key: String): String? = cache.get(key)
+    operator fun get(key: Any): String? = this[key.toString()]
     operator fun set(key: String, value: String) {
         cache.put(key, value)
+    }
+    operator fun set(key: Any, value: Any) {
+        this[key.toString()] = value.toString()
     }
 
     fun delete(key: String) {
         cache.remove(key)
+    }
+
+    fun delete(key: Any) {
+        delete(key.toString())
     }
 
     fun close() {

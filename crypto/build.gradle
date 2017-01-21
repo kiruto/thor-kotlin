@@ -22,5 +22,5 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
-    provide project(':env')
+    compile project(':env')
 }

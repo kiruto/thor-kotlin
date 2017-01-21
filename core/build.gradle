@@ -27,5 +27,6 @@ dependencies {
     compile group: 'com.zaxxer', name: 'HikariCP', version: libs.hikari
     compile group: 'org.ehcache', name: 'ehcache', version: libs.ehcache
 
-    provide project(':env')
+    compile project(':env')
+    compile project(':crypto')
 }
