@@ -2,11 +2,14 @@ package com.exyui.thor.core.ctrl
 
 import com.exyui.thor.*
 import com.exyui.thor.core.*
+import com.exyui.thor.core.cache.ThorCache
+import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
 import com.exyui.thor.core.plugin.Bus
 import com.exyui.thor.core.plugin.COMMENT
 import com.exyui.thor.core.plugin.LIFE.*
+import rx.Observable
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4 as esc
 
 /**
@@ -77,6 +80,38 @@ object Controller {
     fun editComment(id: Int, text: String? = null, author: String? = null, website: String? = null): Comment {
         val result = Comment.update(id, text, author, website)
         return result
+    }
+
+    @Throws(ThorBadRequest::class)
+    fun fetch(uri: String, after: Double = .0, parent: Int? = -1, limit: Int? = null, plain: Int? = 0, nestedLimit: Int? = null) {
+        val rootId = parent
+        val shouldPlain = plain == 0
+        val replyCounts = Comment.replyCount(uri, after = after)
+        val rootList = Comment.fetch(uri, 5, after, parent, limit = limit)
+        rootList.isEmpty.subscribe { if (it) throw ThorNotFound(uri) }
+        rootId?.let {
+            if (it !in replyCounts) {
+                replyCounts[it] = 0
+            }
+        }
+        val totalReplies = if (rootId != null) replyCounts[rootId]?: 0 else 0
+        val comments = processFetchedList(rootList, shouldPlain)
+        val rv = FetchResult(rootId, totalReplies, totalReplies - rootList.count().toBlocking().single(), comments)
+
+    }
+
+    private fun processFetchedList(c: Observable<Comment>, plain: Boolean = false): List<Comment> {
+        TODO()
+//        c.map {
+////            val key = it.email?: it.remoteAddr
+////            val value = ThorCache["hash"][key]
+//            var session = ThorSession[it.id!!]
+//            if (session == null) {
+//                ThorSession.save(it.id, it.remoteAddr, it.email)
+//                session = ThorSession[it.id]
+//            }
+//
+//        }
     }
 
     fun like(id: Int, remoteAddr: String) = Comment.vote(true, id, remoteAddr.anonymize())

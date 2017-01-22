@@ -8,7 +8,9 @@ task createEnvironment {
                 Properties props = new Properties()
                 props.load(new FileInputStream("$project.rootDir/local.properties"))
                 props.each { prop ->
-                    project.ext.set(prop.key, prop.value)
+                    if (!prop.value.toString().isEmpty()) {
+                        project.ext.set(prop.key, prop.value)
+                    }
                 }
             } else {
                 println("Create local properties, this file shall never be commited.")

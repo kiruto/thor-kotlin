@@ -1,5 +1,6 @@
 package com.exyui.thor.core.cache
 
+import com.exyui.thor.core.ctrl.anonymize
 import com.exyui.thor.crypto.forceEnc
 
 /**
@@ -11,8 +12,11 @@ object ThorSession {
 
     /**
      * Save a session
-     * @todo: 客户端拿到这个IV后，首先应该用自己的mail和remoteAddr进行加密，并改写该session的cookie。之后用加密后的token进行对话
-     * @todo: 注意，客户端可能除了IV外还需要知道自己的remote address
+     * todo: 客户端拿到这个IV后，首先应该用自己的mail和remoteAddr进行加密，并改写该session的cookie。之后用加密后的token进行对话
+     * todo: 注意，客户端可能除了IV外还需要知道自己的remote address
+     *
+     * !!warning!! remote address must be anonymized before use.
+     *
      * @return: IV. Use to check the contents after encrypted by this
      */
     fun save(id: Int, remoteAddr: String, mail: String? = null): String {

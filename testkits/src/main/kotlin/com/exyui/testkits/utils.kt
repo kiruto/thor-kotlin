@@ -8,6 +8,7 @@ import java.lang.Math.pow
 import java.lang.Math.abs
 import java.lang.Math.min
 import java.util.*
+import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
 
@@ -58,7 +59,7 @@ fun tof(): Boolean = Random().nextBoolean()
 fun ton(): Boolean? = if (tof()) true else null
 
 /**
- * @return an Object gives or null randomly
+ * @return Return an Object gave or null randomly
  */
 fun <T> aon(a: T?): T? = if (tof()) a else null
 
@@ -75,7 +76,7 @@ fun getRandomHexString(numchars: Int): String {
 fun randomWebsite() = "http://${randomAlphaNumOfLength(3, 10)}.com"
 fun randomEmail() = "${randomAlphaNumOfLength(3, 10)}@${randomAlphaNumOfLength(3, 10)}.com"
 
-fun err(e: KClass<out Throwable>, func: () -> Unit): Boolean {
+fun err(e: KClass<out Throwable>, func: () -> Any): Boolean {
     try {
         func.invoke()
     } catch (ex: Throwable) {
@@ -85,8 +86,20 @@ fun err(e: KClass<out Throwable>, func: () -> Unit): Boolean {
     return false
 }
 
-fun assertErr(e: KClass<out Throwable>, func: () -> Unit) {
+fun assertErr(func: () -> Any) {
+    assertErr(Throwable::class, func)
+}
+
+fun assertErr(e: KClass<out Throwable>, func: () -> Any) {
     assertTrue(err(e, func))
+}
+
+infix fun KClass<out Throwable>.mustThrowAt(func: () -> Any) {
+    assertErr(this, func)
+}
+
+infix fun (() -> Any).mustThrow(throwable: KClass<out Throwable>) {
+    assertErr(throwable, this)
 }
 
 infix fun Any?.mustEq(other: Any?) {

@@ -50,8 +50,7 @@ fun Comment.verify(): VerifyResult {
 }
 
 /**
- * Anonymize IPv4 and IPv6 :param remote_addr: to /24 (zero'd)
- * and /48 (zero'd).
+ * Anonymize IPv4 and IPv6 to /24 (zero'd) and /48 (zero'd).
  */
 internal fun String.anonymize(): String {
     val ip = InetAddresses.forString(this)

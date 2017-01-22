@@ -1,5 +1,7 @@
 package com.exyui.thor.core
 
+import com.exyui.testkits.mustEq
+import com.exyui.testkits.mustThrowAt
 import com.exyui.thor.core.ctrl.anonymize
 import com.github.davidmoten.rx.Transformers
 import org.junit.Test
@@ -24,19 +26,19 @@ class UtilTestSuite {
         val an6 = "1234:2234:3234:4234:0:0:0:0"
         ipAssert(v4, an4)
         ipAssert(v6, an6)
+
+        IllegalArgumentException::class mustThrowAt { "asdf".anonymize() }
     }
 
     private fun ipAssert(list: List<String>, anonymize: String) {
         Observable.from(list)
                 .compose(Transformers.mapWithIndex())
-                .map {
-                    Pair(it.index(), it.value().toString().anonymize() == anonymize.anonymize())
-                }
+                .map { Pair(it.index(), it.value().toString().anonymize() == anonymize.anonymize()) }
                 .subscribe {
-                    assertEquals(when(it.first) {
+                    it.second mustEq when(it.first) {
                         3L -> false
                         else -> true
-                    }, it.second)
+                    }
                 }
     }
 }

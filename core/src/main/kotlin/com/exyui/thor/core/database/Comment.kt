@@ -135,7 +135,7 @@ data class Comment private constructor(val tid: Int? = null,
          * @param: uri
          * @param: mode
          */
-        fun fetch(uri: String, mode: Int = 5, after: Int = 0, parent: Int? = -1, orderBy: String = "id", limit: Int? = null): Observable<Comment> {
+        fun fetch(uri: String, mode: Int = 5, after: Double = .0, parent: Int? = -1, orderBy: String = "id", limit: Int? = null): Observable<Comment> {
             var sql = "SELECT comments.* FROM comments INNER JOIN threads ON " +
                     "threads.uri=? AND comments.tid=threads.id AND (? | comments.mode) = ? " +
                     "AND comments.created > ? "
@@ -260,7 +260,7 @@ data class Comment private constructor(val tid: Int? = null,
         /**
          * Return comment count for main thread and all reply threads for one url.
          */
-        fun replyCount(url: String, mode: Int = 5, after: Double = .0): Map<Int, Int> {
+        fun replyCount(url: String, mode: Int = 5, after: Double = .0): MutableMap<Int, Int> {
             val sql = "SELECT comments.parent,count(*) FROM comments " +
                     "INNER JOIN threads ON threads.uri=? AND comments.tid=threads.id AND (? | comments.mode = ?) AND comments.created > ? " +
                     "GROUP BY comments.parent"
@@ -356,6 +356,10 @@ data class Comment private constructor(val tid: Int? = null,
                 .get { Pair(it.getInt(fieldSize + 1), Comment(it)) }
                 .toBlocking()
                 .single()
+    }
+
+    fun hash(): String {
+        return ""
     }
 
     override fun hashCode(): Int {

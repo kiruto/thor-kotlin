@@ -2,6 +2,7 @@ package com.exyui.thor.core
 
 import com.exyui.testkits.*
 import com.exyui.thor.core.cache.ThorSession
+import com.exyui.thor.core.ctrl.anonymize
 import com.exyui.thor.crypto.encrypt
 import com.exyui.thor.crypto.encryptWith
 import org.junit.Test
@@ -16,12 +17,13 @@ class SessionTestSuite {
     @Test fun test() {
         Observable.from(0..10)
                 .subscribe {
-                    val s = getSession()
-                    val iv = ThorSession.save(s.id, s.remote, s.mail)
-                    val hash = (s.mail?: s.remote).encryptWith(iv)
-                    assertTrue(ThorSession.check(s.id, hash))
-                    ThorSession.delete(s.id)
-                    assertFalse(ThorSession.check(s.id, hash))
+                    with(getSession()) {
+                        val iv = ThorSession.save(id, remote.anonymize(), mail)
+                        val hash = (mail?: remote.anonymize()).encryptWith(iv)
+                        assertTrue(ThorSession.check(id, hash))
+                        ThorSession.delete(id)
+                        assertFalse(ThorSession.check(id, hash))
+                    }
                 }
     }
 

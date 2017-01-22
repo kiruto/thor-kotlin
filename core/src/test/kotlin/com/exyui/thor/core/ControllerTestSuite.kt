@@ -3,11 +3,11 @@ package com.exyui.thor.core
 import com.exyui.thor.core.ctrl.Controller
 import com.exyui.thor.core.database.Comment
 import com.exyui.testkits.*
+import com.exyui.thor.core.ctrl.anonymize
 import org.junit.Test
 import org.junit.Assert.*
 import rx.Observable
 import java.util.*
-import kotlin.reflect.KClass
 
 /**
  * Created by yuriel on 1/17/17.
@@ -115,7 +115,7 @@ class ControllerTestSuite {
     }
 
     @Test fun commentShouldNotFound() {
-        err(ThorNotFound::class) {
+        assertErr(ThorNotFound::class) {
             repeat(10) {
                 Controller.viewComment(Random().nextInt())
             }
@@ -223,7 +223,7 @@ class ControllerTestSuite {
             comment.website mustEq it.website
             comment.text mustEq it.text
             comment.mode mustEq it.mode
-            comment.remoteAddr mustEq it.remoteAddr
+            comment.remoteAddr.anonymize() mustEq it.remoteAddr
         }
         return result!!.id!!
     }
