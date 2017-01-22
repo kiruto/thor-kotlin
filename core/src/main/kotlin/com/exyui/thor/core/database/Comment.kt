@@ -120,13 +120,14 @@ data class Comment private constructor(val tid: Int? = null,
          * @return a comment.
          */
         operator fun get(id: Int): Comment? {
-            return Conn.observable
+            val r = Conn.observable
                     .select("SELECT * FROM comments WHERE id=?")
                     .parameter(id)
                     .get(::Comment)
-                    .first()
+                    .toList()
                     .toBlocking()
                     .single()
+            return if (r.isEmpty()) null else r[0]
         }
 
         /**

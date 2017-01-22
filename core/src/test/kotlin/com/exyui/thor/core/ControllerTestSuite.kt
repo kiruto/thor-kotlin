@@ -114,6 +114,14 @@ class ControllerTestSuite {
                 }
     }
 
+    @Test fun commentShouldNotFound() {
+        err(ThorNotFound::class) {
+            repeat(10) {
+                Controller.viewComment(Random().nextInt())
+            }
+        }
+    }
+
     private fun testSingleThreadCRUD(uri: String) {
         val TEST_RECORDS = 100
 
