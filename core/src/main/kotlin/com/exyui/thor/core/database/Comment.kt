@@ -46,6 +46,8 @@ data class Comment private constructor(val tid: Int? = null,
                                        @PublicApi val dislikes: Int = 0,
                                        val voters: ByteArray? = null) {
 
+    val user = (email?: remoteAddr).toLowerCase()
+
     var userIdentity: String? = null
         set(value) {
             if (null == field && value != null) field = value
@@ -53,8 +55,7 @@ data class Comment private constructor(val tid: Int? = null,
 
         get() {
             if (null == field) {
-                val id = (email?: remoteAddr).toLowerCase()
-                val b = MessageDigest.getInstance("MD5").digest(id.toByteArray(Charset.forName("UTF-8")))
+                val b = MessageDigest.getInstance("MD5").digest(user.toByteArray(Charset.forName("UTF-8")))
                 field = DatatypeConverter.printHexBinary(b)
             }
             return field

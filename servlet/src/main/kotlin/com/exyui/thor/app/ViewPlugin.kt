@@ -17,12 +17,12 @@ internal object ViewPlugin : OnNewComment {
         active(this)
     }
 
-    override fun onActivate() {
-        log.debug("core plugin activated")
+    override fun onActivate(part: String) {
+        log.debug("core plugin: $part activated")
     }
 
-    override fun onDisable() {
-        log.debug("core plugin disabled")
+    override fun onDisable(part: String) {
+        log.debug("core plugin: $part disabled")
     }
 
     override fun onNewThread(thread: Thread) {
@@ -36,5 +36,10 @@ internal object ViewPlugin : OnNewComment {
 
     override fun afterSave(comment: Comment) {
         log.debug("saved: $comment")
+    }
+
+    override fun finishSave(thread: Thread, comment: Comment) {
+        log.debug("saved: $comment")
+        log.debug("at: $thread")
     }
 }

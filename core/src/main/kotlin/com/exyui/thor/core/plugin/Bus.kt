@@ -9,25 +9,47 @@ import com.exyui.thor.core.database.Thread
  * Created by yuriel on 1/18/17.
  */
 internal object Bus {
-    private val bus = EventBus()
+    private val bus = EventBus(javaClass.name)
 
-    private val commentPlugin = mutableListOf<OnNewComment>()
+    private val newCommentPlugin = mutableListOf<OnNewComment>()
+    private val editCommentPlugin = mutableListOf<OnEditComment>()
+    private val deleteCommentPlugin = mutableListOf<OnDeleteComment>()
 
     init {
         bus.register(this)
     }
 
     fun addPlugin(plugin: Plugin) {
-        if (plugin is OnNewComment) {
-            commentPlugin.add(plugin)
-            plugin.onActivate()
+        when(plugin) {
+            is OnNewComment -> {
+                newCommentPlugin.add(plugin)
+                plugin.onActivate(PART_ON_NEW_COMMENT)
+            }
+            is OnEditComment -> {
+                editCommentPlugin.add(plugin)
+                plugin.onActivate(PART_ON_EDIT_COMMENT)
+            }
+            is OnDeleteComment -> {
+                deleteCommentPlugin.add(plugin)
+                plugin.onActivate(PART_ON_DELETE_COMMENT)
+            }
         }
     }
 
     fun removePlugin(plugin: Plugin) {
-        if (plugin is OnNewComment) {
-            commentPlugin.remove(plugin)
-            plugin.onDisable()
+        when(plugin) {
+            is OnNewComment -> {
+                newCommentPlugin.remove(plugin)
+                plugin.onDisable(PART_ON_NEW_COMMENT)
+            }
+            is OnEditComment -> {
+                editCommentPlugin.remove(plugin)
+                plugin.onDisable(PART_ON_EDIT_COMMENT)
+            }
+            is OnDeleteComment -> {
+                deleteCommentPlugin.remove(plugin)
+                plugin.onDisable(PART_ON_DELETE_COMMENT)
+            }
         }
     }
 
@@ -44,14 +66,26 @@ internal object Bus {
         when(event.target) {
             COMMENT.NEW -> {
                 when(event.life) {
-                    LIFE.NEW_THREAD -> commentPlugin.forEach { it.onNewThread(event.what() as Thread) }
-                    LIFE.BEFORE_SAVE -> commentPlugin.forEach {
+                    LIFE.NULL -> { /* Nothing needed to do here */ }
+                    LIFE.NEW_THREAD -> newCommentPlugin.forEach { it.onNewThread(event.what() as Thread) }
+                    LIFE.BEFORE_SAVE -> newCommentPlugin.forEach {
                         val t = event.data[0] as Thread
                         val c = event.data[1] as Comment
                         it.beforeSave(t, c)
                     }
-                    LIFE.AFTER_SAVE -> commentPlugin.forEach { it.afterSave(event.what() as Comment) }
+                    LIFE.AFTER_SAVE -> newCommentPlugin.forEach { it.afterSave(event.what() as Comment) }
+                    LIFE.FINISH -> newCommentPlugin.forEach {
+                        val t = event.data[0] as Thread
+                        val c = event.data[1] as Comment
+                        it.beforeSave(t, c)
+                    }
                 }
+            }
+            COMMENT.EDIT -> {
+                editCommentPlugin.forEach { it.onEdit(event.what() as Comment) }
+            }
+            COMMENT.DELETE -> {
+                deleteCommentPlugin.forEach { it.onDelete(event.what() as Int) }
             }
         }
     }

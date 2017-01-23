@@ -11,13 +11,16 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.security.SecureRandom
 
-
-private const val BLOCK_SIZE = 16   // bytes
-
 /**
  * Created by yuriel on 1/16/17.
  * @see: http://exyui.com/article/4/%E4%BD%BF%E7%94%A8crypto-js%E4%B8%8EPyCrypto%E6%89%93%E9%80%A0%E7%9B%B8%E5%AF%B9%E5%AE%89%E5%85%A8%E7%9A%84%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE
  */
+
+/**
+ * 128 bits (16 bytes)
+ * @see: https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
+ */
+private const val BLOCK_SIZE = 16
 
 /**
  * @see: http://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters/6481658#6481658

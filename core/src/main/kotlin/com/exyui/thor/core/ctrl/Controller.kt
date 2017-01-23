@@ -3,6 +3,7 @@ package com.exyui.thor.core.ctrl
 import com.exyui.thor.*
 import com.exyui.thor.core.*
 import com.exyui.thor.core.cache.CoreCache.*
+import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
 import com.exyui.thor.core.plugin.Bus
@@ -58,8 +59,18 @@ object Controller {
         }
 
         Bus.p(COMMENT.NEW, BEFORE_SAVE, thread, c)
+
+        /**
+         * insert into database
+         */
         val rv = c.insert(uri)
         Bus.p(COMMENT.NEW, AFTER_SAVE, rv.second)
+
+        /**
+         * insert into cache
+         */
+        USER_IDENTIFY.cache[rv.second.user] = rv.second.userIdentity!!
+        Bus.p(COMMENT.NEW, FINISH, thread, rv.second)
         return rv
     }
 
@@ -74,10 +85,13 @@ object Controller {
 
     fun deleteComment(id: Int) {
         Comment.delete(id)
+        ThorSession.delete(id)
+        Bus.p(COMMENT.DELETE, NULL, id)
     }
 
     fun editComment(id: Int, text: String? = null, author: String? = null, website: String? = null): Comment {
         val result = Comment.update(id, text, author, website)
+        Bus.p(COMMENT.EDIT, NULL, result)
         return result
     }
 
@@ -126,9 +140,9 @@ object Controller {
 
     private fun Observable<Comment>.processFetchedList(plain: Boolean = false): Observable<Comment> {
         return map {
-            var user = USER_IDENTIFY.cache[it.id!!]
+            var user = USER_IDENTIFY.cache[it.user]
             if (null == user) {
-                USER_IDENTIFY.cache[it.id] = it.userIdentity!!
+                USER_IDENTIFY.cache[it.user] = it.userIdentity!!
                 user = it.userIdentity!!
             }
             it.userIdentity = user

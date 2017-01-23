@@ -7,15 +7,19 @@ package com.exyui.thor.core.plugin
 internal interface TARGET
 
 internal enum class COMMENT(private val alias: String): TARGET {
-    NEW("new");
+    NEW("new"),
+    DELETE("delete"),
+    EDIT("edit");
 
     override fun toString() = alias
 }
 
 internal enum class LIFE(private val alias: String) {
+    NULL(""),
     NEW_THREAD("new-thread"),
     BEFORE_SAVE("before-save"),
-    AFTER_SAVE("after-save");
+    AFTER_SAVE("after-save"),
+    FINISH("finish");
 
     override fun toString(): String = alias
 }
