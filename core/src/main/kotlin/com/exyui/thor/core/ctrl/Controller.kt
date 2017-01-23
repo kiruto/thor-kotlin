@@ -2,8 +2,7 @@ package com.exyui.thor.core.ctrl
 
 import com.exyui.thor.*
 import com.exyui.thor.core.*
-import com.exyui.thor.core.cache.ThorCache
-import com.exyui.thor.core.cache.ThorSession
+import com.exyui.thor.core.cache.CoreCache.*
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
 import com.exyui.thor.core.plugin.Bus
@@ -83,7 +82,7 @@ object Controller {
     }
 
     @Throws(ThorBadRequest::class)
-    fun fetch(uri: String, after: Double = .0, parent: Int? = -1, limit: Int? = null, plain: Int? = 0, nestedLimit: Int? = null) {
+    fun fetch(uri: String, after: Double = .0, parent: Int? = -1, limit: Int? = null, plain: Int? = 0, nestedLimit: Int? = null): FetchResult {
         val rootId = parent
         val shouldPlain = plain == 0
         val replyCounts = Comment.replyCount(uri, after = after)
@@ -95,28 +94,50 @@ object Controller {
             }
         }
         val totalReplies = if (rootId != null) replyCounts[rootId]?: 0 else 0
-        val comments = processFetchedList(rootList, shouldPlain)
-        val rv = FetchResult(rootId, totalReplies, totalReplies - rootList.count().toBlocking().single(), comments)
-
+        val comments = rootList.processFetchedList()
+        val result = Observable.just(null == rootId)
+                .flatMap {
+                    if (it) {
+                        comments.map {
+                            if (it.id in replyCounts) {
+                                it.totalReplies = replyCounts[it.id]
+                                val replies = Comment
+                                        .fetch(uri, 5, after, it.id!!, limit = nestedLimit)
+                                        .processFetchedList()
+                                        .toList()
+                                        .toBlocking()
+                                        .single()
+                                it.replies.addAll(replies)
+                            } else {
+                                it.totalReplies = 0
+                            }
+                            it.hiddenReplies = it.totalReplies!! - it.replies.size
+                            it
+                        }
+                    } else {
+                        comments
+                    }
+                }
+                .toList()
+                .toBlocking()
+                .single()
+        return FetchResult(rootId, totalReplies, totalReplies - rootList.count().toBlocking().single(), result)
     }
 
-    private fun processFetchedList(c: Observable<Comment>, plain: Boolean = false): List<Comment> {
-        TODO()
-//        c.map {
-////            val key = it.email?: it.remoteAddr
-////            val value = ThorCache["hash"][key]
-//            var session = ThorSession[it.id!!]
-//            if (session == null) {
-//                ThorSession.save(it.id, it.remoteAddr, it.email)
-//                session = ThorSession[it.id]
-//            }
-//
-//        }
+    private fun Observable<Comment>.processFetchedList(plain: Boolean = false): Observable<Comment> {
+        return map {
+            var user = USER_IDENTIFY.cache[it.id!!]
+            if (null == user) {
+                USER_IDENTIFY.cache[it.id] = it.userIdentity!!
+                user = it.userIdentity!!
+            }
+            it.userIdentity = user
+            it
+        }
     }
 
     fun like(id: Int, remoteAddr: String) = Comment.vote(true, id, remoteAddr.anonymize())
     fun dislike(id: Int, remoteAddr: String) = Comment.vote(false, id, remoteAddr.anonymize())
     fun counts(vararg uri: String): IntArray =  Comment.count(*uri)
     fun count(uri: String): Int = counts(uri)[0]
-
 }

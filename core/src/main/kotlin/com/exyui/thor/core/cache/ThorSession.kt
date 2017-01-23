@@ -1,5 +1,6 @@
 package com.exyui.thor.core.cache
 
+import com.exyui.thor.core.cache.CoreCache.*
 import com.exyui.thor.core.ctrl.anonymize
 import com.exyui.thor.crypto.forceEnc
 
@@ -7,7 +8,7 @@ import com.exyui.thor.crypto.forceEnc
  * Created by yuriel on 1/21/17.
  */
 object ThorSession {
-    private val sessionCache = ThorCache["session"]
+    private val sessionCache = SESSION.cache
 //    private val ivCache = ThorCache["iv"]
 
     /**

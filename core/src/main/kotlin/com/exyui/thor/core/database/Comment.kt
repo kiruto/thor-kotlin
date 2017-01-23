@@ -8,7 +8,10 @@ import com.google.common.hash.Funnels
 import rx.Observable
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.nio.charset.Charset
+import java.security.MessageDigest
 import java.sql.ResultSet
+import javax.xml.bind.DatatypeConverter
 
 /**
  * Created by yuriel on 1/14/17.
@@ -42,6 +45,26 @@ data class Comment private constructor(val tid: Int? = null,
                                        @PublicApi val likes: Int = 0,
                                        @PublicApi val dislikes: Int = 0,
                                        val voters: ByteArray? = null) {
+
+    var userIdentity: String? = null
+        set(value) {
+            if (null == field && value != null) field = value
+        }
+
+        get() {
+            if (null == field) {
+                val id = (email?: remoteAddr).toLowerCase()
+                val b = MessageDigest.getInstance("MD5").digest(id.toByteArray(Charset.forName("UTF-8")))
+                field = DatatypeConverter.printHexBinary(b)
+            }
+            return field
+        }
+
+    var totalReplies: Int? = null
+
+    var hiddenReplies: Int? = null
+
+    val replies = mutableListOf<Comment>()
 
     private constructor(rs: ResultSet): this(
             tid = rs.getInt(1),
@@ -356,10 +379,6 @@ data class Comment private constructor(val tid: Int? = null,
                 .get { Pair(it.getInt(fieldSize + 1), Comment(it)) }
                 .toBlocking()
                 .single()
-    }
-
-    fun hash(): String {
-        return ""
     }
 
     override fun hashCode(): Int {
