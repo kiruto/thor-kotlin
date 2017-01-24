@@ -35,6 +35,8 @@ fun randomAlphaNumOfLength(from: Int, to: Int = 0): String {
     return sb.toString()
 }
 
+fun randomRange(bound: Int, from: Int = 0) = from..(from + Random().nextInt(bound))
+
 fun <T> List<T>.anyOne(): T? {
     if (isEmpty()) return null
     val i = Random().nextInt(size)
@@ -52,6 +54,11 @@ fun <T> List<T>.shuffle(): List<T> {
  * @return true or false randomly
  */
 fun tof(): Boolean = Random().nextBoolean()
+
+/**
+ * @return result or null
+ */
+fun <T>ron(func: () -> (T)): T? = if (tof()) func.invoke() else null
 
 /**
  * @return true or null randomly

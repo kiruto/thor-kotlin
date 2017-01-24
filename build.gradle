@@ -9,6 +9,7 @@ buildscript {
                 sqlite_jdbc: '3.16.1',
                 rxjava_jdbc: '0.7.3',
                 guava: '19.0',
+                gson: '2.8.0',
                 apache_commons: '3.5',
                 log4j: '2.7',
                 javaee: '7.0',

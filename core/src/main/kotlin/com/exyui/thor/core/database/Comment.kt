@@ -5,6 +5,7 @@ import com.exyui.thor.core.PublicApi
 import com.github.davidmoten.rx.jdbc.Database
 import com.google.common.hash.BloomFilter
 import com.google.common.hash.Funnels
+import org.apache.commons.lang3.builder.HashCodeBuilder
 import rx.Observable
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -85,6 +86,11 @@ data class Comment private constructor(val tid: Int? = null,
     )
 
     internal companion object {
+
+        val publicFields = listOf(
+                "id", "parent", "created", "modified", "text", "author", "website",
+                "likes", "dislikes", "userIdentity", "totalReplies", "hiddenReplies", "replies"
+        )
 
         val fieldSize = 14
 
@@ -383,11 +389,30 @@ data class Comment private constructor(val tid: Int? = null,
     }
 
     override fun hashCode(): Int {
-        return toString().hashCode()
+        return (HashCodeBuilder() + tid + id + parent + created + modified + mode +
+                remoteAddr + text + author + email + website + likes + dislikes).toHashCode()
     }
 
+    private operator fun HashCodeBuilder.plus(any: Any?): HashCodeBuilder = this.append(any)
+
     override fun equals(other: Any?): Boolean {
-        return toString() == other?.toString()
+        if (null == other) return false
+        if (other !is Comment) return false
+        return other.let {
+            tid == it.tid
+            && id == it.tid
+            && parent == it.parent
+            && created == it.created
+            && modified == it.modified
+            && mode == it.mode
+            && remoteAddr == it.remoteAddr
+            && text == it.text
+            && author == it.author
+            && email == it.email
+            && website == it.website
+            && likes == it.likes
+            && dislikes == it.dislikes
+        }
     }
 
     fun toKVString(): String {
@@ -404,6 +429,54 @@ data class Comment private constructor(val tid: Int? = null,
                 website?.let { "website = $website, " }.orEmpty() +
                 "likes = $likes, " +
                 "dislikes = $dislikes"
+    }
+
+    internal class ApiBuilder {
+
+        // Database Attributes
+        private var tid: Int? = null
+        var id: Int? = null
+        var parent: Int? = null
+        var created: Double? = null
+        var modified: Double? = null
+        private var mode: Int = 0
+        private var remoteAddr: String = ""
+        var text: String = ""
+        var author: String? = null
+        private var email: String? = null
+        var website: String? = null
+        var likes: Int = 0
+        var dislikes: Int = 0
+        private var voters: ByteArray? = null
+
+        // Not In Database
+        var userIdentity: String? = null
+        var totalReplies: Int? = null
+        var hiddenReplies: Int? = null
+        val replies = mutableListOf<Comment>()
+
+        fun build(): Comment {
+            val c = Comment(
+                    tid = tid,
+                    id = id,
+                    parent = parent,
+                    created = created,
+                    modified = modified,
+                    mode = mode,
+                    remoteAddr = remoteAddr,
+                    text = text,
+                    author = author,
+                    email = email,
+                    website = website,
+                    likes = likes,
+                    dislikes = dislikes,
+                    voters = voters)
+            c.userIdentity = userIdentity
+            c.totalReplies = totalReplies
+            c.hiddenReplies = hiddenReplies
+            c.replies.addAll(replies)
+            return c
+        }
     }
 }
 

@@ -14,7 +14,7 @@ internal object ViewPlugin : OnNewComment {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     init {
-        active(this)
+        active()
     }
 
     override fun onActivate(part: String) {

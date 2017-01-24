@@ -156,26 +156,6 @@ class ControllerTestSuite {
         ids.size mustEq 0
     }
 
-    private fun createComment(
-            uri: String,
-            author: String = randomAlphaNumOfLength(3, 10),
-            parent: Int? = aon(getRandomComment(uri)?.id),
-            email: String = randomEmail(),
-            website: String = randomWebsite(),
-            text: String = randomAlphaNumOfLength(3, 100),
-            mode: Int = 1,
-            remoteAddr: String = "127.0.0.1"): Comment {
-        return Comment.create(
-                author = author,
-                parent = parent,
-                email = email,
-                website = website,
-                text = text,
-                mode = mode,
-                remoteAddr = remoteAddr
-        )
-    }
-
     private fun insertComment(c: Comment, uri: String): Pair<Int, Comment> {
         return Controller.insertComment(
                 uri = uri,
@@ -228,13 +208,6 @@ class ControllerTestSuite {
         return result!!.id!!
     }
 
-    private fun getRandomComment(uri: String): Comment? {
-        val editList = Comment.fetch(uri).toList().toBlocking().single()
-        val c = editList.anyOne()
-        println("look for any one from uri=$uri: $c")
-        return c
-    }
-
     private fun countComment(url: String, times: Int) {
         var count = 0
         kotlin.repeat(times) {
@@ -243,6 +216,4 @@ class ControllerTestSuite {
             Controller.count(url) mustEq count
         }
     }
-
-    private fun randomURL() = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
 }

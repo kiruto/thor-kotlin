@@ -6,6 +6,7 @@ import com.exyui.thor.core.cache.CoreCache.*
 import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.database.Thread
+import com.exyui.thor.core.model.FetchResult
 import com.exyui.thor.core.plugin.Bus
 import com.exyui.thor.core.plugin.COMMENT
 import com.exyui.thor.core.plugin.LIFE.*

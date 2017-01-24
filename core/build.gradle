@@ -20,6 +20,7 @@ dependencies {
     compile "org.xerial:sqlite-jdbc:$libs.sqlite_jdbc"
     compile "com.github.davidmoten:rxjava-jdbc:$libs.rxjava_jdbc"
     compile "com.google.guava:guava:$libs.guava"
+    compile group: 'com.google.code.gson', name: 'gson', version: libs.gson
     compile group: 'org.apache.commons', name: 'commons-lang3', version: libs.apache_commons
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: libs.log4j
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: libs.log4j

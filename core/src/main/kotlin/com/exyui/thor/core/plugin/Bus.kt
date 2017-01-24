@@ -23,15 +23,15 @@ internal object Bus {
         when(plugin) {
             is OnNewComment -> {
                 newCommentPlugin.add(plugin)
-                plugin.onActivate(PART_ON_NEW_COMMENT)
+                plugin.onActivate(plugin.name())
             }
             is OnEditComment -> {
                 editCommentPlugin.add(plugin)
-                plugin.onActivate(PART_ON_EDIT_COMMENT)
+                plugin.onActivate(plugin.name())
             }
             is OnDeleteComment -> {
                 deleteCommentPlugin.add(plugin)
-                plugin.onActivate(PART_ON_DELETE_COMMENT)
+                plugin.onActivate(plugin.name())
             }
         }
     }
@@ -40,15 +40,15 @@ internal object Bus {
         when(plugin) {
             is OnNewComment -> {
                 newCommentPlugin.remove(plugin)
-                plugin.onDisable(PART_ON_NEW_COMMENT)
+                plugin.onDisable(plugin.name())
             }
             is OnEditComment -> {
                 editCommentPlugin.remove(plugin)
-                plugin.onDisable(PART_ON_EDIT_COMMENT)
+                plugin.onDisable(plugin.name())
             }
             is OnDeleteComment -> {
                 deleteCommentPlugin.remove(plugin)
-                plugin.onDisable(PART_ON_DELETE_COMMENT)
+                plugin.onDisable(plugin.name())
             }
         }
     }
