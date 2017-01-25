@@ -11,12 +11,14 @@ import kotlin.reflect.KClass
 private val gsonBuilder by lazy {
     val result = GsonBuilder()
             .registerTypeAdapter(Comment::class.java, CommentTypeAdapter)
+            .registerTypeAdapter(FetchResult::class.java, FetchResultTypeAdapter)
     if (DEBUG) result.setPrettyPrinting()
     result
 }
 
 val gson = gsonBuilder.create()
 
-fun Comment.toJson() = gson.toJson(this)
-fun String.createComment() = gson.fromJson(this, Comment::class.java)
-fun String.createObject(clazz: KClass<*>) = gson.fromJson(this, clazz.java)
+fun Comment.toJson() = gson.toJson(this)!!
+fun String.createComment() = gson.fromJson(this, Comment::class.java)!!
+fun String.createObject(clazz: KClass<*>) = gson.fromJson(this, clazz.java)!!
+fun Map<String, *>.toJson() = gson.toJson(this)!!

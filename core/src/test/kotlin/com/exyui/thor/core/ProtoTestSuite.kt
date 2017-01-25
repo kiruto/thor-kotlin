@@ -1,13 +1,20 @@
 package com.exyui.thor.core
 
+import com.exyui.testkits.aon
+import com.exyui.testkits.mustEq
+import com.exyui.testkits.randomAlphaNumOfLength
 import com.exyui.testkits.ron
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.model.createComment
+import com.exyui.thor.core.model.gson
 import com.exyui.thor.core.model.toJson
+import com.google.gson.reflect.TypeToken
 import org.junit.Assert.*
 import org.junit.Test
 import rx.Observable
 import java.util.*
+
+
 
 /**
  * Created by yuriel on 1/24/17.
@@ -27,6 +34,19 @@ class ProtoTestSuite {
                     println(it.toJson())
                     it.toJson().createComment() eq it
                 }
+    }
+
+    @Test fun testMapToJson() {
+        val map = mutableMapOf<String, String?>()
+        repeat(10) {
+            map.put(randomAlphaNumOfLength(3, 10), aon(randomAlphaNumOfLength(1, 100)))
+        }
+        val json = map.toJson()
+        val typeOfHashMap = object: TypeToken<Map<String, String>>() {}.type
+        val newMap: Map<String, String> = gson.fromJson(json, typeOfHashMap)
+        map.forEach {
+            it.value mustEq newMap[it.key]
+        }
     }
 
     private fun nest(comment: Comment) {
