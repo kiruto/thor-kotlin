@@ -9,7 +9,7 @@ import rx.Observable
 /**
  * Created by yuriel on 1/24/17.
  */
-class CommentTypeAdapter: TypeAdapter<Comment>() {
+object CommentTypeAdapter: TypeAdapter<Comment>() {
     override fun write(writer: JsonWriter, c: Comment) {
         writer.beginObject()
         Comment.publicFields.forEach {
@@ -44,6 +44,7 @@ class CommentTypeAdapter: TypeAdapter<Comment>() {
     override fun read(reader: JsonReader): Comment {
         return Observable
                 .create<JsonReader> {
+                    it.onStart()
                     reader.beginObject()
                     while (reader.hasNext()) {
                         try {
@@ -55,7 +56,7 @@ class CommentTypeAdapter: TypeAdapter<Comment>() {
                     reader.endObject()
                     it.onCompleted()
                 }
-                .reduce(Comment.ApiBuilder()) { builder, reader ->
+                .reduce(Comment.Builder()) { builder, reader ->
                     when(reader.nextName()) {
                         "id" -> builder.id = reader.nextInt()
                         "parent" -> builder.parent = reader.nextInt()

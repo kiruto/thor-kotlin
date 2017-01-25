@@ -1,9 +1,6 @@
 package com.exyui.thor.core
 
-import com.exyui.testkits.mustEq
-import com.exyui.testkits.randomRange
 import com.exyui.testkits.ron
-import com.exyui.testkits.tof
 import com.exyui.thor.core.database.Comment
 import com.exyui.thor.core.model.createComment
 import com.exyui.thor.core.model.toJson
@@ -18,7 +15,7 @@ import java.util.*
 class ProtoTestSuite {
     val url = randomURL()
 
-    @Test fun toJson() {
+    @Test fun testJson() {
         Observable.from(0..10)
                 .map {
                     val comment = createComment(url)

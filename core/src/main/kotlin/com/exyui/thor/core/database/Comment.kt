@@ -431,7 +431,7 @@ data class Comment private constructor(val tid: Int? = null,
                 "dislikes = $dislikes"
     }
 
-    internal class ApiBuilder {
+    internal class Builder {
 
         // Database Attributes
         private var tid: Int? = null

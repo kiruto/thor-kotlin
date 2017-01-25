@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  */
 private val gsonBuilder by lazy {
     val result = GsonBuilder()
-            .registerTypeAdapter(Comment::class.java, CommentTypeAdapter())
+            .registerTypeAdapter(Comment::class.java, CommentTypeAdapter)
     if (DEBUG) result.setPrettyPrinting()
     result
 }
