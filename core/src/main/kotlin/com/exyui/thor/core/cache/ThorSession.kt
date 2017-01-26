@@ -1,7 +1,6 @@
 package com.exyui.thor.core.cache
 
 import com.exyui.thor.core.cache.CoreCache.*
-import com.exyui.thor.core.ctrl.anonymize
 import com.exyui.thor.crypto.forceEnc
 
 /**

@@ -14,6 +14,7 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
+    compile "org.mockito:mockito-core:$libs.mockito"
     compile group: 'junit', name: 'junit', version: libs.junit
     compile group: 'org.apache.commons', name: 'commons-lang3', version: libs.apache_commons
 }

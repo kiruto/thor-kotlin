@@ -94,6 +94,9 @@ data class Comment private constructor(val tid: Int? = null,
 
         val fieldSize = 14
 
+        /**
+         * The only function to create a comment instance you should use.
+         */
         fun create(author: String?, parent: Int?, email: String?, website: String?, text: String, mode: Int, remoteAddr: String): Comment {
             return Comment(
                     author = author,

@@ -52,7 +52,7 @@ fun Comment.verify(): VerifyResult {
 /**
  * Anonymize IPv4 and IPv6 to /24 (zero'd) and /48 (zero'd).
  */
-internal fun String.anonymize(): String {
+fun String.anonymize(): String {
     val ip = InetAddresses.forString(this)
     val addr = ip.hostAddress
     return when(ip) {

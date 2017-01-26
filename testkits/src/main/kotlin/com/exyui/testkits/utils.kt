@@ -116,3 +116,7 @@ infix fun Any?.mustEq(other: Any?) {
 infix fun Any?.mustNot(other: Any?) {
     assertNotEquals(this, other)
 }
+
+infix fun <T> Collection<T>.mustIn(other: Collection<T>) {
+    assertTrue(other.containsAll(this))
+}
