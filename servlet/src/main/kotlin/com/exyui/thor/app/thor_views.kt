@@ -4,6 +4,7 @@ import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.ctrl.Controller
 import com.exyui.thor.core.ctrl.anonymize
 import com.exyui.thor.core.model.toJson
+import com.exyui.thor.crypto.decrypt
 import com.exyui.thor.crypto.encrypt
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.HttpServlet
@@ -14,28 +15,46 @@ import javax.servlet.http.HttpServletResponse
  * Created by yuriel on 1/23/17.
  */
 
-@WebServlet(name = "NewComment", value = "/thor/new") class NewComment: HttpServlet() {
-    override fun doPost(req: HttpServletRequest, res: HttpServletResponse) {
-        req.xhr()
-        res.stream()
-        res.writer.write(newComment(req).encrypt())
+@WebServlet(name = "TestEncrypt", value = "/thor/encrypt/debug") class EncryptDebugView: HttpServlet(){
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        debugOrThrow()
+        val content = req.getParameter("content")
+        val key = req.getParameter("key")
+        resp.writer.write(encrypt(content, key))
     }
 }
 
-@WebServlet(name = "NewCommentDebug", value = "/thor/new/debug") class NewCommentDebug: HttpServlet() {
-    override fun doPost(req: HttpServletRequest, res: HttpServletResponse) {
+@WebServlet(name = "TestDecrypt", value = "/thor/decrypt/debug") class DecryptDebugView: HttpServlet() {
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
-        doRequest(req, res)
+        val content = req.getParameter("content")
+        val key = req.getParameter("key")
+        resp.writer.write(decrypt(content, key))
+    }
+}
+
+@WebServlet(name = "NewComment", value = "/thor/new") class NewCommentView: HttpServlet() {
+    override fun doPost(req: HttpServletRequest, resq: HttpServletResponse) {
+        req.xhr()
+        resq.stream()
+        resq.writer.write(newComment(req).encrypt())
+    }
+}
+
+@WebServlet(name = "NewCommentDebug", value = "/thor/new/debug") class NewCommentDebugView: HttpServlet() {
+    override fun doPost(req: HttpServletRequest, resq: HttpServletResponse) {
+        debugOrThrow()
+        doRequest(req, resq)
     }
 
-    override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
+    override fun doGet(req: HttpServletRequest, resq: HttpServletResponse) {
         debugOrThrow()
-        doRequest(req, res)
+        doRequest(req, resq)
     }
 
-    private fun doRequest(req: HttpServletRequest, res: HttpServletResponse) {
+    private fun doRequest(req: HttpServletRequest, resq: HttpServletResponse) {
         val result = newComment(req)
-        res.writer.write(result)
+        resq.writer.write(result)
     }
 }
 

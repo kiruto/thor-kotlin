@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse
  */
 @WebServlet(name = "Test", value = "/thor")
 class TestController : HttpServlet() {
-    override fun doGet(req: HttpServletRequest, res: HttpServletResponse) {
-        res.writer.write("I am Thor!")
+    override fun doGet(req: HttpServletRequest, resq: HttpServletResponse) {
+        resq.writer.write("I am Thor!")
     }
 }
