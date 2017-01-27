@@ -2,6 +2,7 @@ package com.exyui.thor.app
 
 import com.exyui.thor.DEBUG
 import com.exyui.thor.core.model.gson
+import com.exyui.thor.crypto.decrypt
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.KClass
@@ -27,18 +28,38 @@ fun HttpServletRequest.xhr() {
     }
 }
 
-fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>, key: String = "d"): T {
+/**
+ * The json data in GET request should be put into a wrapper with a key like `d`
+ * POST request should not have a wrapper parameter like `d`, please send json data directly.
+ */
+fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>, key: String = "d", encrypted: Boolean = false): T {
     return when(method) {
-        "GET" -> gson.fromJson(getParameter(key), clazz.java)!!
+        "GET" -> {
+            val content = if (encrypted) getParameter(key).decrypt() else getParameter(key)
+            gson.fromJson(content, clazz.java)!!
+        }
         "POST" -> {
-            val body = reader.readText()
+            val body = if (encrypted) reader.readText().decrypt() else reader.readText()
             gson.fromJson(body, clazz.java)!!
         }
         else -> throw ForbiddenErr("not supported")
     }
 }
 
+/**
+ * An easy way to parse
+ */
 infix fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>) = parse(clazz, "d")
+
+/**
+ * Decrypt and parse to @param <T> typed object.
+ */
+fun <T: Any> HttpServletRequest.parseEncrypted(clazz: KClass<T>, key: String = "d") = parse(clazz, key, true)
+
+/**
+ * An easy way to decrypt and parse
+ */
+infix fun <T: Any> HttpServletRequest.parseEncrypted(clazz: KClass<T>) = parseEncrypted(clazz, "d")
 
 fun HttpServletResponse.stream() {
     contentType = "application/octet-stream"

@@ -97,7 +97,7 @@ class RequestTestSuite {
     ): NewCommentParameter {
 
         return NewCommentParameter(
-                uri = uri ifEmpty randomURL(),
+                uri = uri ifEmpty randomReferredURL(),
                 title = title ifEmpty randomAlphaNumOfLength(3, 10),
                 text = text ifEmpty randomAlphaNumOfLength(10, 100),
                 author = author?: aon(randomAlphaNumOfLength(5, 10)),
@@ -107,5 +107,5 @@ class RequestTestSuite {
         )
     }
 
-    fun randomURL() = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
+    private fun randomReferredURL() = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
 }

@@ -1,4 +1,4 @@
 # Run script
-```gradle
+```shell
 ./gradlew appRun
 ```
