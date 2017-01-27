@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse
  * Created by yuriel on 1/23/17.
  */
 
-@WebServlet(name = "TestEncrypt", value = "/thor/encrypt/debug") class EncryptDebugView: HttpServlet(){
+const val URL_TEST_ENCRYPT = "/thor/encrypt/debug"
+@WebServlet(name = "TestEncrypt", value = URL_TEST_ENCRYPT) class EncryptDebugView: HttpServlet(){
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
         val content = req.getParameter("content")
@@ -24,7 +25,8 @@ import javax.servlet.http.HttpServletResponse
     }
 }
 
-@WebServlet(name = "TestDecrypt", value = "/thor/decrypt/debug") class DecryptDebugView: HttpServlet() {
+const val URL_TEST_DECRYPT = "/thor/decrypt/debug"
+@WebServlet(name = "TestDecrypt", value = URL_TEST_DECRYPT) class DecryptDebugView: HttpServlet() {
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
         val content = req.getParameter("content")
@@ -33,7 +35,8 @@ import javax.servlet.http.HttpServletResponse
     }
 }
 
-@WebServlet(name = "NewComment", value = "/thor/new") class NewCommentView: HttpServlet() {
+const val URL_NEW_COMMENT = "/thor/new"
+@WebServlet(name = "NewComment", value = URL_NEW_COMMENT) class NewCommentView: HttpServlet() {
     override fun doPost(req: HttpServletRequest, resq: HttpServletResponse) {
         req.xhr()
         resq.stream()
@@ -41,7 +44,12 @@ import javax.servlet.http.HttpServletResponse
     }
 }
 
-@WebServlet(name = "NewCommentDebug", value = "/thor/new/debug") class NewCommentDebugView: HttpServlet() {
+/**
+ * request parameter:
+ *  d: json string of struct {@link NewCommentParameter}
+ */
+const val URL_NEW_COMMENT_DEBUG = "/thor/new/debug"
+@WebServlet(name = "NewCommentDebug", value = URL_NEW_COMMENT_DEBUG) class NewCommentDebugView: HttpServlet() {
     override fun doPost(req: HttpServletRequest, resq: HttpServletResponse) {
         debugOrThrow()
         doRequest(req, resq)

@@ -27,7 +27,16 @@ fun HttpServletRequest.xhr() {
     }
 }
 
-fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>, key: String = "d") = gson.fromJson(getParameter(key), clazz.java)!!
+fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>, key: String = "d"): T {
+    return when(method) {
+        "GET" -> gson.fromJson(getParameter(key), clazz.java)!!
+        "POST" -> {
+            val body = reader.readText()
+            gson.fromJson(body, clazz.java)!!
+        }
+        else -> throw ForbiddenErr("not supported")
+    }
+}
 
 infix fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>) = parse(clazz, "d")
 

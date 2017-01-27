@@ -8,7 +8,6 @@ import java.lang.Math.pow
 import java.lang.Math.abs
 import java.lang.Math.min
 import java.util.*
-import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
 
@@ -83,29 +82,33 @@ fun getRandomHexString(numchars: Int): String {
 fun randomWebsite() = "http://${randomAlphaNumOfLength(3, 10)}.com"
 fun randomEmail() = "${randomAlphaNumOfLength(3, 10)}@${randomAlphaNumOfLength(3, 10)}.com"
 
-fun err(e: KClass<out Throwable>, func: () -> Any): Boolean {
+fun err(e: KClass<out Throwable>, func: () -> Unit): Boolean {
     try {
         func.invoke()
     } catch (ex: Throwable) {
-        println(ex.message)
-        return e.java == ex.javaClass
+        return (e.java == ex.javaClass || e.java.isAssignableFrom(ex.javaClass)).let {
+            ex.printStackTrace()
+            it
+        }
     }
     return false
 }
 
-fun assertErr(func: () -> Any) {
+fun err(func: () -> Unit): Boolean = err(Exception::class, func)
+
+fun assertErr(func: () -> Unit) {
     assertErr(Throwable::class, func)
 }
 
-fun assertErr(e: KClass<out Throwable>, func: () -> Any) {
+fun assertErr(e: KClass<out Throwable>, func: () -> Unit) {
     assertTrue(err(e, func))
 }
 
-infix fun KClass<out Throwable>.mustThrowAt(func: () -> Any) {
+infix fun KClass<out Throwable>.mustThrowAt(func: () -> Unit) {
     assertErr(this, func)
 }
 
-infix fun (() -> Any).mustThrow(throwable: KClass<out Throwable>) {
+infix fun (() -> Unit).mustThrow(throwable: KClass<out Throwable>) {
     assertErr(throwable, this)
 }
 

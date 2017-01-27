@@ -45,6 +45,7 @@ task createEnvironment {
             writer.writeLine "const val DEBUG = $debug"
             writer.writeLine ""
             writer.writeLine "const val SQLITE_FILE = \"$db_file\""
+            writer.writeLine "const val HTTP_PORT = $http_port"
             writer.writeLine "const val MODERATED = false"
             writer.writeLine ""
             writer.writeLine "const val PACKAGE_VERSION = \"$version\""

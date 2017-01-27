@@ -15,6 +15,10 @@ repositories {
 
 dependencies {
     testCompile project(":testkits")
+    testCompile "com.squareup.retrofit2:retrofit:$libs.retrofit"
+    testCompile "com.squareup.retrofit2:converter-gson:$libs.retrofit"
+    testCompile "com.squareup.retrofit2:adapter-rxjava:$libs.retrofit"
+    testCompile "com.squareup.okhttp3:logging-interceptor:$libs.okhttp3"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
@@ -29,6 +33,10 @@ dependencies {
 
 gretty {
     servletContainer = 'jetty9'
-    httpPort = 8081
+    httpPort = http_port as Integer
     contextPath = '/'
+    afterEvaluate {
+        test.dependsOn appRun
+    }
 }
+

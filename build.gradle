@@ -18,7 +18,9 @@ buildscript {
                 hikari: '2.5.1',
                 ehcache: '3.2.0',
                 junit: '4.12',
-                mockito: '2.6.8'
+                mockito: '2.6.8',
+                retrofit: '2.1.0',
+                okhttp3: '3.3.1'
         ]
     }
 
