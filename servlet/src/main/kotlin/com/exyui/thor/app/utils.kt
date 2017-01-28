@@ -38,11 +38,10 @@ fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>, key: String = "d", encry
             val content = if (encrypted) getParameter(key).decrypt() else getParameter(key)
             gson.fromJson(content, clazz.java)!!
         }
-        "POST" -> {
+        else -> {
             val body = if (encrypted) reader.readText().decrypt() else reader.readText()
             gson.fromJson(body, clazz.java)!!
         }
-        else -> throw ForbiddenErr("not supported")
     }
 }
 

@@ -20,6 +20,6 @@ val gson = gsonBuilder.create()!!
 
 fun Comment.toJson() = gson.toJson(this)!!
 fun String.createComment() = gson.fromJson(this, Comment::class.java)!!
-fun String.createObject(clazz: KClass<*>) = gson.fromJson(this, clazz.java)!!
+fun <T: Any> String.createObject(clazz: KClass<T>) = gson.fromJson<T>(this, clazz.java)!!
 fun Any.toJson() = gson.toJson(this)!!
 fun Map<String, *>.toJson() = gson.toJson(this)!!

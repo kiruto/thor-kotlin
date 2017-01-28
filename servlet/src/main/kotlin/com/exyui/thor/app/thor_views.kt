@@ -50,10 +50,9 @@ const val URL_NEW_COMMENT = "/thor/new"
         req.xhr()
         resq.stream()
         resq.writer.write(
-                newComment(
-                        req parseEncrypted NewCommentParameter::class,
-                        req.remoteAddr.anonymize()
-                ).encrypt()
+                (req parseEncrypted NewCommentParameter::class)
+                        .execute(req.remoteAddr.anonymize())
+                        .encrypt()
         )
     }
 }
@@ -78,18 +77,16 @@ const val URL_NEW_COMMENT_DEBUG = "/thor/new/debug"
     private fun doRequest(req: HttpServletRequest, resq: HttpServletResponse) {
         val remote = req.remoteAddr.anonymize()
         val param = req parse NewCommentParameter::class
-        val result = newComment(param, remote)
+        val result = param.execute(remote)
         resq.writer.write(result)
     }
 }
 
-private fun newComment(param: NewCommentParameter, remote: String): String {
-    val insertResult = param.let {
-        Controller.insertComment(it.uri, it.title, it.author, it.email, it.website, it.text, remote, it.parent)
-    }
+private fun NewCommentParameter.execute(remote: String): String {
+    val insertResult = Controller.insertComment(uri, title, author, email, website, text, remote, parent)
     val id = insertResult.first
     val comment = insertResult.second
-    val token = ThorSession.save(comment.id!!, remote, param.email)
+    val token = ThorSession.save(comment.id!!, remote, email)
     return NewCommentResult(id, comment, remote, token).toJson()
 }
 
@@ -99,9 +96,33 @@ private fun newComment(param: NewCommentParameter, remote: String): String {
  * DELETE: delete comment
  * POST: other actions
  */
-const val URL_EDIT_COMMENT = "/thor/id"
-@WebServlet(name = "EDIT_COMMENT", value = URL_EDIT_COMMENT) class CommentView: HttpServlet() {
-    override fun doPut(req: HttpServletRequest?, resp: HttpServletResponse?) {
-
+const val URL_COMMENT = "/thor/id"
+@WebServlet(name = "Comment", value = URL_COMMENT) class CommentView: HttpServlet() {
+    /**
+     * Edit comment.
+     *
+     * param {@link EditCommentParameter}
+     */
+    override fun doPut(req: HttpServletRequest, resp: HttpServletResponse) {
+        req.xhr()
+        resp.stream()
     }
+}
+
+const val URL_COMMENT_DEBUG = "/thor/id/debug"
+@WebServlet(name = "CommentDebug", value = URL_COMMENT_DEBUG) class CommentDebugView: HttpServlet() {
+    override fun doPut(req: HttpServletRequest, resp: HttpServletResponse) {
+        debugOrThrow()
+        val param = req parse EditCommentParameter::class
+        val result = param.execute(req.remoteAddr)
+        resp.writer.write(result.toJson())
+    }
+}
+
+private fun EditCommentParameter.execute(remote: String): EditCommentResult {
+    if(!ThorSession.check(id, session)) {
+        throw ForbiddenErr("bad signature")
+    }
+    val result = Controller.editComment(id, text, author, website)
+    return EditCommentResult(result, remote, "")
 }
