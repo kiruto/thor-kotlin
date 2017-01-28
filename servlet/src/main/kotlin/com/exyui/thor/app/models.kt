@@ -32,6 +32,10 @@ data class EditCommentParameter(
         val website: String?
 )
 
+/**
+ * param:
+ *  newToken: IV where will be used when encrypt the old session for next request.
+ */
 data class EditCommentResult(
-        val comment: Comment, val ip: String, val token: String
+        val comment: Comment, val ip: String, val newToken: String
 )

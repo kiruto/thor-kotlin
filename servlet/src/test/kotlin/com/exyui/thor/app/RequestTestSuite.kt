@@ -4,7 +4,6 @@ import com.exyui.testkits.*
 import com.exyui.thor.DEBUG
 import com.exyui.thor.HOST_DEBUG
 import com.exyui.thor.HTTP_PORT
-import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.ifEmpty
 import com.exyui.thor.core.model.createObject
 import com.exyui.thor.core.model.gson
@@ -80,12 +79,31 @@ class RequestTestSuite {
                     .createObject(NewCommentResult::class)
 
             // PUT edit comment
-            val p2 = getEditCommentParam(p1.email, comm1.ip, comm1.token, comm1.comment.id!!)
-            val edit = debug.editComment(p2)
+            val session2 = (p1.email?: comm1.ip).encryptWith(comm1.token)
+            val p2 = getEditCommentParam(session2, comm1.comment.id!!)
+            val edit2 = debug.editComment(p2)
                     .execute()
                     .body()
                     .string()
                     .createObject(EditCommentResult::class)
+
+            // Edit twice with the renewed token
+            val p3 = getEditCommentParam(session2.encryptWith(edit2.newToken), edit2.comment.id!!)
+            val edit3 = debug.editComment(p3)
+                    .execute()
+                    .body()
+                    .string()
+                    .createObject(EditCommentResult::class)
+
+            // Must error when edit with a wrong session token
+            assertErr {
+                val p = getEditCommentParam(randomEmail(), comm1.ip, comm1.token, comm1.comment.id!!)
+                debug.editComment(p)
+                        .execute()
+                        .body()
+                        .string()
+                        .createObject(EditCommentResult::class)
+            }
         }
     }
 
@@ -119,6 +137,20 @@ class RequestTestSuite {
     }
 
     private fun getEditCommentParam(
+            session: String,
+            id: Int,
+            text: String? = null,
+            author: String? = null,
+            website: String? = null
+    ): EditCommentParameter {
+        return EditCommentParameter(
+                session, id,
+                text?: aon(randomAlphaNumOfLength(10, 100)),
+                author?: aon(randomAlphaNumOfLength(3, 10)),
+                website?: aon(randomWebsite()))
+    }
+
+    private fun getEditCommentParam(
             email: String? = null,
             remoteAddr: String,
             token: String,
@@ -126,14 +158,8 @@ class RequestTestSuite {
             text: String? = null,
             author: String? = null,
             website: String? = null
-    ): EditCommentParameter {
-        val session = (email?: remoteAddr).encryptWith(token)
-        return EditCommentParameter(
-                session, id,
-                text?: aon(randomAlphaNumOfLength(10, 100)),
-                author?: aon(randomAlphaNumOfLength(3, 10)),
-                website?: aon(randomWebsite()))
-    }
+    ) = getEditCommentParam((email?: remoteAddr).encryptWith(token), id, text, author, website)
+
 
     private fun randomReferredURL() = "http://test.exyui.com/${randomAlphaNumOfLength(10)}"
 }

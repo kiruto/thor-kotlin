@@ -124,5 +124,6 @@ private fun EditCommentParameter.execute(remote: String): EditCommentResult {
         throw ForbiddenErr("bad signature")
     }
     val result = Controller.editComment(id, text, author, website)
-    return EditCommentResult(result, remote, "")
+    val token = ThorSession.renew(id, session)
+    return EditCommentResult(result, remote, token)
 }

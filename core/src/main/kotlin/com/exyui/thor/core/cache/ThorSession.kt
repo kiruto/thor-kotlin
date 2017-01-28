@@ -8,7 +8,6 @@ import com.exyui.thor.crypto.forceEnc
  */
 object ThorSession {
     private val sessionCache = SESSION.cache
-//    private val ivCache = ThorCache["iv"]
 
     /**
      * Save a session
@@ -21,8 +20,14 @@ object ThorSession {
      */
     fun save(id: Int, remoteAddr: String, mail: String? = null): String {
         val v = mail?: remoteAddr
-        val enc = v.forceEnc()
-//        ivCache[id] = enc.iv
+        return renew(id, v)
+    }
+
+    /**
+     * Renew token from old session token.
+     */
+    fun renew(id: Int, old: String): String {
+        val enc = old.forceEnc()
         sessionCache[id] = enc.r
         return enc.iv
     }
@@ -35,7 +40,6 @@ object ThorSession {
     }
 
     fun delete(id: Int) {
-//        ivCache.delete(id)
         sessionCache.delete(id)
     }
 }
