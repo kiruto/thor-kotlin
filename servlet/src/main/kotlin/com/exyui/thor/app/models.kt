@@ -39,3 +39,13 @@ data class EditCommentParameter(
 data class EditCommentResult(
         val comment: Comment, val ip: String, val newToken: String
 )
+
+/**
+ * param:
+ *  session: Token encrypted user {@link Comment#user}
+ *  id: comment id
+ */
+data class DeleteCommentParameter(
+        val session: String,
+        val id: Int
+)

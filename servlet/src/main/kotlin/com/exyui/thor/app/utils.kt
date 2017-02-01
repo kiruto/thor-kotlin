@@ -21,11 +21,12 @@ fun debugOrThrow() = if (DEBUG) DEBUG else throw ForbiddenErr("Release")
  * If the header is not sent or requests `application/octet-stream`, the request is
  * not forged (XHR is restricted by CORS separately).
  */
-fun HttpServletRequest.xhr() {
+fun HttpServletRequest.xhr(): HttpServletRequest {
     contentType?.let {
         if (it.isNotEmpty() && !it.startsWith("application/octet-stream"))
             throw ForbiddenErr("CSRF")
     }
+    return this
 }
 
 /**
@@ -34,7 +35,7 @@ fun HttpServletRequest.xhr() {
  */
 fun <T: Any> HttpServletRequest.parse(clazz: KClass<T>, key: String = "d", encrypted: Boolean = false): T {
     return when(method) {
-        "GET" -> {
+        "GET", "DELETE" -> {
             val content = if (encrypted) getParameter(key).decrypt() else getParameter(key)
             gson.fromJson(content, clazz.java)!!
         }

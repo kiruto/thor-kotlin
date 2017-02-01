@@ -1,10 +1,12 @@
 package com.exyui.thor.app
 
+import org.junit.Assert.*
 import com.exyui.testkits.*
 import com.exyui.thor.DEBUG
 import com.exyui.thor.HOST_DEBUG
 import com.exyui.thor.HTTP_PORT
 import com.exyui.thor.core.ifEmpty
+import com.exyui.thor.core.model.createComment
 import com.exyui.thor.core.model.createObject
 import com.exyui.thor.core.model.gson
 import com.exyui.thor.core.model.toJson
@@ -88,7 +90,8 @@ class RequestTestSuite {
                     .createObject(EditCommentResult::class)
 
             // Edit twice with the renewed token
-            val p3 = getEditCommentParam(session2.encryptWith(edit2.newToken), edit2.comment.id!!)
+            val session3 = session2.encryptWith(edit2.newToken)
+            val p3 = getEditCommentParam(session3, edit2.comment.id!!)
             val edit3 = debug.editComment(p3)
                     .execute()
                     .body()
@@ -104,15 +107,36 @@ class RequestTestSuite {
                         .string()
                         .createObject(EditCommentResult::class)
             }
+
+            // Must error when delete with a wrong session token
+            assertErr {
+                val p = DeleteCommentParameter(session3, edit3.comment.id!!)
+                debug.deleteComment(p.toJson())
+                        .execute()
+                        .body()
+                        .string()
+                        .createComment()
+            }
+
+            // Delete comment
+            val session4 = session3.encryptWith(edit3.newToken)
+            val p4 = DeleteCommentParameter(session4, edit3.comment.id!!)
+            val delete4 = debug.deleteComment(p4.toJson())
+                    .execute()
+                    .body()
+                    .string()
+                    .createComment()
+            assertNull(delete4)
         }
     }
 
     private interface DebugThorService {
-        @GET(URL_TEST_ENCRYPT) fun encrypt(@Query("key")key: String, @Query("content") content: String): Call<ResponseBody>
-        @GET(URL_TEST_DECRYPT) fun decrypt(@Query("key")key: String, @Query("content") content: String): Call<ResponseBody>
+        @GET(URL_TEST_ENCRYPT) fun encrypt(@Query("key") key: String, @Query("content") content: String): Call<ResponseBody>
+        @GET(URL_TEST_DECRYPT) fun decrypt(@Query("key") key: String, @Query("content") content: String): Call<ResponseBody>
         @GET(URL_NEW_COMMENT_DEBUG) fun newCommentDebugGet(@Query("d") data: String): Call<ResponseBody>
         @POST(URL_NEW_COMMENT_DEBUG) fun newCommentDebugPost(@Body data: NewCommentParameter): Call<ResponseBody>
         @PUT(URL_COMMENT_DEBUG) fun editComment(@Body data: EditCommentParameter): Call<ResponseBody>
+        @DELETE(URL_COMMENT_DEBUG) fun deleteComment(@Query("d") data: String): Call<ResponseBody>
     }
 
     private fun getCommentParam(

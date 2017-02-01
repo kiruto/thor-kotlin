@@ -84,10 +84,11 @@ object Controller {
         return "http://$url"
     }
 
-    fun deleteComment(id: Int) {
+    fun deleteComment(id: Int): Comment? {
         Comment.delete(id)
         ThorSession.delete(id)
         Bus.p(COMMENT.DELETE, NULL, id)
+        return Comment[id]
     }
 
     fun editComment(id: Int, text: String? = null, author: String? = null, website: String? = null): Comment {

@@ -1,7 +1,7 @@
 package com.exyui.thor.core.cache
 
 import com.exyui.thor.core.cache.CoreCache.*
-import com.exyui.thor.crypto.forceEnc
+import com.exyui.thor.crypto.encryptWithRandomIV
 
 /**
  * Created by yuriel on 1/21/17.
@@ -27,7 +27,7 @@ object ThorSession {
      * Renew token from old session token.
      */
     fun renew(id: Int, old: String): String {
-        val enc = old.forceEnc()
+        val enc = old.encryptWithRandomIV()
         sessionCache[id] = enc.r
         return enc.iv
     }

@@ -32,7 +32,7 @@ class ProtoTestSuite {
                 .subscribe {
                     println(it)
                     println(it.toJson())
-                    it.toJson().createComment() eq it
+                    it.toJson().createComment()!! eq it
                 }
     }
 

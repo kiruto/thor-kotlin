@@ -102,6 +102,7 @@ fun assertErr(func: () -> Unit) {
 
 fun assertErr(e: KClass<out Throwable>, func: () -> Unit) {
     assertTrue(err(e, func))
+    printPassedBanner()
 }
 
 infix fun KClass<out Throwable>.mustThrowAt(func: () -> Unit) {
@@ -122,4 +123,10 @@ infix fun Any?.mustNot(other: Any?) {
 
 infix fun <T> Collection<T>.mustIn(other: Collection<T>) {
     assertTrue(other.containsAll(this))
+}
+
+private fun printPassedBanner() {
+    println("┌────────────────────────────────────────────────────────┐")
+    println("│                     Assert passed!                     │")
+    println("└────────────────────────────────────────────────────────┘")
 }

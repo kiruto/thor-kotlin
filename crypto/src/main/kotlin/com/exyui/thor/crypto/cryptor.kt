@@ -59,7 +59,7 @@ private fun getRandomIV(): ByteArray {
     return iv
 }
 
-fun String.forceEnc() = encryptWithIV(this, getRandomIV())
+fun String.encryptWithRandomIV() = encryptWithIV(this, getRandomIV())
 fun String.encryptWith(iv: String) = encryptWithIV(this, iv.toBytes()).r
 
 /**

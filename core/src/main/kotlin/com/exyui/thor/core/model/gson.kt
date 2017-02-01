@@ -19,7 +19,7 @@ private val gsonBuilder by lazy {
 val gson = gsonBuilder.create()!!
 
 fun Comment.toJson() = gson.toJson(this)!!
-fun String.createComment() = gson.fromJson(this, Comment::class.java)!!
+fun String.createComment(): Comment? = gson.fromJson(this, Comment::class.java)
 fun <T: Any> String.createObject(clazz: KClass<T>) = gson.fromJson<T>(this, clazz.java)!!
 fun Any.toJson() = gson.toJson(this)!!
 fun Map<String, *>.toJson() = gson.toJson(this)!!
