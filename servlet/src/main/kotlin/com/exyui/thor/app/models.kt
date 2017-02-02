@@ -65,3 +65,5 @@ data class FetchCommentParameter(
         val plain: Int?,
         val nestedLimit: Int?
 )
+
+data class VoteParameter(val id: Int, val like: Boolean)

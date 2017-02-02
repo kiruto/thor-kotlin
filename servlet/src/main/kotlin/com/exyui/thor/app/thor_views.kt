@@ -198,6 +198,11 @@ private fun DeleteCommentParameter.execute(resp: HttpServletResponse): String? {
     return Controller.deleteComment(id)?.toJson()
 }
 
+/**
+ * GET:
+ *  param:
+ *      p: json string of struct {@link FetchCommentParameter}
+ */
 const val URL_FETCH = "/thor"
 @WebServlet(name = "Fetch", value = URL_FETCH) class FetchView: HttpServlet() {
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
@@ -233,6 +238,41 @@ private fun HttpServletRequest.getFetchParameter(): FetchCommentParameter {
 private fun FetchCommentParameter.execute(): String {
     val p = if (null == parent) -1 else if (0 == parent) null else parent
     return Controller.fetch(uri, after?: .0, p, limit, plain, nestedLimit).toJson()
+}
+
+/**
+ * POST:
+ *  param:
+ *      id: (Int)comment id
+ *      like: (Boolean) like or dislike
+ */
+const val URL_VOTE = "/thor/vote"
+@WebServlet(name = "Vote", value = URL_VOTE) class VoteView: HttpServlet() {
+    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        resp.stream()
+        req.xhr()
+                .parseEncrypted(VoteParameter::class)
+                .execute(req)
+                .encrypt()
+                .send(resp)
+    }
+}
+
+const val URL_VOTE_DEBUG = "/thor/vote/debug"
+@WebServlet(name = "VoteDebug", value = URL_VOTE_DEBUG) class VoteDebugView: HttpServlet() {
+    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        req.parse(VoteParameter::class)
+                .execute(req)
+                .send(resp)
+    }
+}
+
+private fun VoteParameter.execute(req: HttpServletRequest): String {
+    return if (like) {
+        Controller.like(id, req.remoteAddr.anonymize())
+    } else {
+        Controller.dislike(id, req.remoteAddr.anonymize())
+    }.toJson()
 }
 
 /**

@@ -5,6 +5,7 @@ import com.exyui.testkits.*
 import com.exyui.thor.DEBUG
 import com.exyui.thor.HOST_DEBUG
 import com.exyui.thor.HTTP_PORT
+import com.exyui.thor.core.database.Vote
 import com.exyui.thor.core.ifEmpty
 import com.exyui.thor.core.model.*
 import com.exyui.thor.crypto.encryptWith
@@ -122,6 +123,23 @@ class RequestTestSuite {
                         .createComment()
             }
 
+            // Vote as like
+            val like = debug.voteComment(VoteParameter(fetch.replies[0].id!!, true))
+                    .execute()
+                    .body()
+                    .string()
+                    .createObject(Vote::class)
+
+            // Vote as dislike
+            val dislike = debug.voteComment(VoteParameter(fetch.replies[0].id!!, false))
+                    .execute()
+                    .body()
+                    .string()
+                    .createObject(Vote::class)
+
+            // Vote by same user will not affect the voting result.
+            dislike mustEq like
+
             // Delete comment
             val session4 = session3.encryptWith(edit3.newToken)
             val p4 = DeleteCommentParameter(session4, edit3.comment.id!!)
@@ -155,6 +173,8 @@ class RequestTestSuite {
                                                @Query("limit") limit: Int? = null,
                                                @Query("plain") plain: Int? = null,
                                                @Query("nestedLimit") nestedLimit: Int? = null): Call<ResponseBody>
+
+        @POST(URL_VOTE_DEBUG) fun voteComment(@Body data: VoteParameter): Call<ResponseBody>
     }
 
     private fun getCommentParam(
