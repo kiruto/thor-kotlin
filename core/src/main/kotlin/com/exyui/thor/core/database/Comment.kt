@@ -302,7 +302,7 @@ data class Comment private constructor(val tid: Int? = null,
                     .parameter(mode)
                     .parameter(mode)
                     .parameter(after)
-                    .get { Pair(it.getInt(0), it.getInt(1)) }
+                    .get { Pair(it.getInt(1), it.getInt(2)) }
                     .reduce(mutableMapOf<Int, Int>()) { map, pair ->
                         map.put(pair.first, pair.second)
                         map

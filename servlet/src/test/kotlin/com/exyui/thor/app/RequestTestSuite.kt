@@ -6,10 +6,7 @@ import com.exyui.thor.DEBUG
 import com.exyui.thor.HOST_DEBUG
 import com.exyui.thor.HTTP_PORT
 import com.exyui.thor.core.ifEmpty
-import com.exyui.thor.core.model.createComment
-import com.exyui.thor.core.model.createObject
-import com.exyui.thor.core.model.gson
-import com.exyui.thor.core.model.toJson
+import com.exyui.thor.core.model.*
 import com.exyui.thor.crypto.encryptWith
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -108,6 +105,13 @@ class RequestTestSuite {
                         .createObject(EditCommentResult::class)
             }
 
+            // Fetch comment
+            val fetch = debug.fetchComment(p1.uri)
+                    .execute()
+                    .body()
+                    .string()
+                    .createObject(FetchResult::class)
+
             // Must error when delete with a wrong session token
             assertErr {
                 val p = DeleteCommentParameter(session3, edit3.comment.id!!)
@@ -131,12 +135,26 @@ class RequestTestSuite {
     }
 
     private interface DebugThorService {
-        @GET(URL_TEST_ENCRYPT) fun encrypt(@Query("key") key: String, @Query("content") content: String): Call<ResponseBody>
-        @GET(URL_TEST_DECRYPT) fun decrypt(@Query("key") key: String, @Query("content") content: String): Call<ResponseBody>
+        @GET(URL_TEST_ENCRYPT) fun encrypt(@Query("key") key: String,
+                                           @Query("content") content: String): Call<ResponseBody>
+
+        @GET(URL_TEST_DECRYPT) fun decrypt(@Query("key") key: String,
+                                           @Query("content") content: String): Call<ResponseBody>
+
         @GET(URL_NEW_COMMENT_DEBUG) fun newCommentDebugGet(@Query("d") data: String): Call<ResponseBody>
+
         @POST(URL_NEW_COMMENT_DEBUG) fun newCommentDebugPost(@Body data: NewCommentParameter): Call<ResponseBody>
+
         @PUT(URL_COMMENT_DEBUG) fun editComment(@Body data: EditCommentParameter): Call<ResponseBody>
+
         @DELETE(URL_COMMENT_DEBUG) fun deleteComment(@Query("d") data: String): Call<ResponseBody>
+
+        @GET(URL_FETCH_DEBUG) fun fetchComment(@Query("uri") uri: String,
+                                               @Query("after") after: Double? = null,
+                                               @Query("parent") parent: Int? = null,
+                                               @Query("limit") limit: Int? = null,
+                                               @Query("plain") plain: Int? = null,
+                                               @Query("nestedLimit") nestedLimit: Int? = null): Call<ResponseBody>
     }
 
     private fun getCommentParam(

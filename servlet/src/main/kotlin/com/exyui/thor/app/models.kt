@@ -49,3 +49,19 @@ data class DeleteCommentParameter(
         val session: String,
         val id: Int
 )
+
+/**
+ * param:
+ *  parent:
+ *      null: Don't care if comments have parent
+ *      0: Comments don't have a parent
+ *      any: Comments' parent
+ */
+data class FetchCommentParameter(
+        val uri: String,
+        val after: Double?,
+        val parent: Int?,
+        val limit: Int?,
+        val plain: Int?,
+        val nestedLimit: Int?
+)

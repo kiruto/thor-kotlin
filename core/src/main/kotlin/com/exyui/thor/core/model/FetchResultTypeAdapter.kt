@@ -44,7 +44,7 @@ object FetchResultTypeAdapter: TypeAdapter<FetchResult>() {
                             it.onError(e)
                         }
                     }
-                    reader.endArray()
+                    reader.endObject()
                     it.onCompleted()
                 }
                 .reduce(FetchResult()) { result, reader ->

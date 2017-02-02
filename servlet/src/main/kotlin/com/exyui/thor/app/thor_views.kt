@@ -77,9 +77,9 @@ const val URL_NEW_COMMENT_DEBUG = "/thor/new/debug"
     }
 
     private fun doRequest(req: HttpServletRequest, resq: HttpServletResponse) {
-        val remote = req.remoteAddr.anonymize()
-        val param = req parse NewCommentParameter::class
-        param.execute(remote).send(resq)
+        req.parse(NewCommentParameter::class)
+                .execute(req.remoteAddr.anonymize())
+                .send(resq)
     }
 }
 
@@ -166,14 +166,16 @@ const val URL_COMMENT_DEBUG = "/thor/id/debug"
 
     override fun doPut(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
-        val param = req parse EditCommentParameter::class
-        param.execute(req.remoteAddr, resp)?.send(resp)
+        req.parse(EditCommentParameter::class)
+                .execute(req.remoteAddr, resp)
+                ?.send(resp)
     }
 
     override fun doDelete(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
-        val param = req parse DeleteCommentParameter::class
-        param.execute(resp)?.send(resp)
+        req.parse(DeleteCommentParameter::class)
+                .execute(resp)
+                ?.send(resp)
     }
 }
 
@@ -182,9 +184,10 @@ private fun EditCommentParameter.execute(remote: String, resp: HttpServletRespon
         resp.forbidden("bad signature", "needed: ${ThorSession[id]}", "gaven: $session")
         return null
     }
-    val result = Controller.editComment(id, text, author, website)
-    val token = ThorSession.renew(id, session)
-    return EditCommentResult(result, remote, token).toJson()
+    return EditCommentResult(
+            Controller.editComment(id, text, author, website),
+            remote,
+            ThorSession.renew(id, session)).toJson()
 }
 
 private fun DeleteCommentParameter.execute(resp: HttpServletResponse): String? {
@@ -193,6 +196,43 @@ private fun DeleteCommentParameter.execute(resp: HttpServletResponse): String? {
         return null
     }
     return Controller.deleteComment(id)?.toJson()
+}
+
+const val URL_FETCH = "/thor"
+@WebServlet(name = "Fetch", value = URL_FETCH) class FetchView: HttpServlet() {
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        resp.stream()
+        req.xhr()
+                .getFetchParameter()
+                .execute()
+                .encrypt()
+                .send(resp)
+    }
+}
+
+const val URL_FETCH_DEBUG = "/thor/debug"
+@WebServlet(name = "FetchDebug", value = URL_FETCH_DEBUG) class FetchDebugView: HttpServlet() {
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        req.getFetchParameter()
+                .execute()
+                .send(resp)
+    }
+}
+
+private fun HttpServletRequest.getFetchParameter(): FetchCommentParameter {
+    return FetchCommentParameter(
+            getParameter("uri"),
+            getParameter("after")?.toDouble(),
+            getParameter("parent")?.toInt(),
+            getParameter("limit")?.toInt(),
+            getParameter("plain")?.toInt(),
+            getParameter("nestedLimit")?.toInt()
+    )
+}
+
+private fun FetchCommentParameter.execute(): String {
+    val p = if (null == parent) -1 else if (0 == parent) null else parent
+    return Controller.fetch(uri, after?: .0, p, limit, plain, nestedLimit).toJson()
 }
 
 /**
