@@ -19,6 +19,13 @@ import javax.servlet.http.HttpServletResponse.SC_NOT_FOUND
  * Thor views
  */
 
+const val URL_INFO = "/thor/info"
+@WebServlet(name = "Info", value = URL_INFO) class InfoView: HttpServlet() {
+    override fun doGet(req: HttpServletRequest?, resp: HttpServletResponse) {
+        resp.writer.write(Controller.info.toJson())
+    }
+}
+
 /**
  * Check encrypt proto for debug
  */
