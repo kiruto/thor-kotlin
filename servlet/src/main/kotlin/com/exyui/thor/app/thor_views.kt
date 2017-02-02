@@ -4,6 +4,7 @@ import com.exyui.thor.core.ThorNotFound
 import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.ctrl.Controller
 import com.exyui.thor.core.ctrl.anonymize
+import com.exyui.thor.core.model.createArray
 import com.exyui.thor.core.model.toJson
 import com.exyui.thor.crypto.decrypt
 import com.exyui.thor.crypto.encrypt
@@ -273,6 +274,32 @@ private fun VoteParameter.execute(req: HttpServletRequest): String {
     } else {
         Controller.dislike(id, req.remoteAddr.anonymize())
     }.toJson()
+}
+
+const val URL_COUNTS = "/thor/counts"
+@WebServlet(name = "Counts", value = URL_COUNTS) class CountsView: HttpServlet() {
+    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        resp.stream()
+        req.xhr()
+                .getParameter("uri")
+                .decrypt()
+                .createArray<String>()
+                .let { Controller.counts(*it) }
+                .toJson()
+                .encrypt()
+                .send(resp)
+    }
+}
+
+const val URL_COUNTS_DEBUG = "/thor/counts/debug"
+@WebServlet(name = "Counts", value = URL_COUNTS_DEBUG) class CountsDebugView: HttpServlet() {
+    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        req.getParameter("uri")
+                .createArray<String>()
+                .let { Controller.counts(*it) }
+                .toJson()
+                .send(resp)
+    }
 }
 
 /**
