@@ -1,5 +1,5 @@
-group 'thor-kotlin'
-version '1.0-SNAPSHOT'
+group group
+version version
 
 buildscript {
     ext{
@@ -22,6 +22,9 @@ buildscript {
                 retrofit: '2.1.0',
                 okhttp3: '3.3.1'
         ]
+        
+        group = "com.exyui.thor"
+        version = "1.0-SNAPSHOT"
     }
 
     repositories {

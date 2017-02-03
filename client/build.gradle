@@ -1,0 +1,41 @@
+group group
+version version
+
+buildscript {
+    def libs = rootProject.libs
+}
+
+apply plugin: 'kotlin2js'
+apply plugin: 'kotlin'
+
+compileKotlin2Js {
+    kotlinOptions.outputFile = "client.js"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src/main/kotlin"
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-js-library:$libs.kotlin_version"
+}
+
+build.doLast {
+    configurations.compile.each { File file ->
+        copy {
+            includeEmptyDirs = false
+
+            from zipTree(file.absolutePath)
+            into "${projectDir}/../static"
+            include { fileTreeElement ->
+                def path = fileTreeElement.path
+                path.endsWith(".js") && (path.startsWith("META-INF/resources/") || !path.startsWith("META-INF/"))
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
-group 'thor-kotlin'
-version '1.0-SNAPSHOT'
+group group
+version version
 
 buildscript {
     def libs = rootProject.libs
