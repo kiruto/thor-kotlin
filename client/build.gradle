@@ -1,17 +1,58 @@
 group group
 version version
 
+def outDir = "${buildDir}/kotlin2js/main"
+
 buildscript {
     def libs = rootProject.libs
 }
 
 apply plugin: 'kotlin2js'
-apply plugin: 'kotlin'
+apply plugin: 'com.moowork.node'
 
-compileKotlin2Js {
-    kotlinOptions.outputFile = "client.js"
+/**
+ * Gradle node plugin block
+ *  Source: <a href="https://github.com/srs/gradle-node-plugin" />
+ *  Doc: <a href="https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md" />
+ *  
+ *  To run script, use gradle cli like "./gradlew :client:npm_install"
+ */
+node {
+    // Version of node to use.
+    version = '6.9.5'
+
+    /**
+     * Version of npm to use.
+     *
+     * If npmVersion is specified, the plugin installs that version of npm into npmWorkDir by the npmSetup task and use it.
+     * If npmVersion is not specified and a locally-installed npm exists, The plugin will use it.
+     * Otherwise, the plugin will use the npm bundled with the version of node installation.
+     */
+    // npmVersion = '4.1.2'
+
+    // Base URL for fetching node distributions (change if you have a mirror).
+    // Default URL is https://nodejs.org/dist
+    distBaseUrl = 'https://npm.taobao.org/dist'
+
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = true
+
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.buildDir}/npm")
+
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}")
 }
 
+compileKotlin2Js {
+    kotlinOptions.outputFile = "${outDir}/client.js"
+    kotlinOptions.moduleKind = "amd"
+    kotlinOptions.sourceMap = true
+}
 sourceSets {
     main.kotlin.srcDirs += "src/main/kotlin"
 }
@@ -31,11 +72,28 @@ build.doLast {
             includeEmptyDirs = false
 
             from zipTree(file.absolutePath)
-            into "${projectDir}/../static"
+            into outDir
             include { fileTreeElement ->
                 def path = fileTreeElement.path
                 path.endsWith(".js") && (path.startsWith("META-INF/resources/") || !path.startsWith("META-INF/"))
             }
+        }
+    }
+}
+
+def depends = ['request']
+def devDepends = []
+
+task setupDependencies() {
+    depends.forEach { dep ->
+        npm_install {
+            args = [dep, '--save']
+        }
+    }
+
+    devDepends.forEach { dep ->
+        npm_install {
+            args = [dep, '--save-dev']
         }
     }
 }

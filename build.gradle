@@ -6,6 +6,7 @@ buildscript {
         libs = [
                 kotlin_version: '1.0.6',
                 tomcat_plugin: '2.2.5',
+                node_plugin: '1.1.1',
                 sqlite_jdbc: '3.16.1',
                 rxjava_jdbc: '0.7.3',
                 guava: '19.0',
@@ -36,6 +37,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$libs.kotlin_version"
         classpath 'org.akhikhl.gretty:gretty:+'
+        classpath "com.moowork.gradle:gradle-node-plugin:$libs.node_plugin"
     }
 }
 
