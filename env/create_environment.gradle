@@ -30,6 +30,7 @@ task createEnvironment {
 
         def slurper = new JsonSlurper()
         def hosts = slurper.parseText host
+        def ports = slurper.parseText localhost_ports
 
         def file = new File(rootDir, 'env/src/main/kotlin/com/exyui/thor/env.kt')
         println("Creating environment configuration file...")
@@ -61,10 +62,16 @@ task createEnvironment {
                 writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")
             }
             writer.writeLine ")"
+            writer.writeLine "val LOCALHOST_PORTS = listOf("
+            writer.writeLine "    $http_port" + (ports.isEmpty()? "": ",")
+            ports.eachWithIndex{ val, idx ->
+                writer.writeLine "    $val" + (idx < ports.size() - 1? ",": "")
+            }
+            writer.writeLine ")"
             writer.writeLine "const val ORIGIN_DEBUG = \"*\""
             writer.writeLine "val ORIGIN_RELEASE = listOf("
             hosts.eachWithIndex { val, idx ->
-                writer.writeLine "    \"$val\"" + (idx == hosts.size() - 1? "": ",")
+                writer.writeLine "    \"$val\"" + (idx < hosts.size() - 1? ",": "")
             }
             writer.writeLine ")"
         }

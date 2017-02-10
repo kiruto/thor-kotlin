@@ -1,5 +1,6 @@
 package com.exyui.thor.app
 
+import com.exyui.thor.AES_KEY
 import com.exyui.thor.core.ThorNotFound
 import com.exyui.thor.core.cache.ThorSession
 import com.exyui.thor.core.ctrl.Controller
@@ -34,7 +35,7 @@ const val URL_TEST_ENCRYPT = "/thor/encrypt/debug"
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
         val content = req.getParameter("content")
-        val key = req.getParameter("key")
+        val key = req.getParameter("key")?: AES_KEY
         resp.writer.write(encrypt(content, key))
     }
 }
@@ -47,7 +48,7 @@ const val URL_TEST_DECRYPT = "/thor/decrypt/debug"
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         debugOrThrow()
         val content = req.getParameter("content")
-        val key = req.getParameter("key")
+        val key = req.getParameter("key")?: AES_KEY
         resp.writer.write(decrypt(content, key))
     }
 }
@@ -120,6 +121,7 @@ const val URL_COMMENT = "/thor/id"
         try {
             Controller.viewComment(req.getParameter("id").toInt())
                     .toJson()
+                    .encrypt()
                     .send(resp)
         } catch (e: ThorNotFound) {
             resp.sendError(SC_NOT_FOUND)
